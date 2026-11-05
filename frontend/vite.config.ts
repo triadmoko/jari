@@ -21,8 +21,7 @@ export default defineConfig({
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
 			// SPA mode: every unknown path falls back to index.html (served by Gin / any static host)
-			adapter: adapter({ fallback: 'index.html' }),
-			alias: { $lib: 'src/lib' }
+			adapter: adapter({ fallback: 'index.html' })
 		})
 	],
 	test: {

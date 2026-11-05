@@ -1,6 +1,6 @@
 <script lang="ts">
 	import IconChevronRight from '@tabler/icons-svelte/icons/chevron-right';
-	import { cn, type WithElementRef } from "$lib/utils.js";
+	import { cn, type WithElementRef } from "#lib/utils.js";
 	import type { HTMLLiAttributes } from "svelte/elements";
 
 	let {

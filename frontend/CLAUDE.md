@@ -45,7 +45,7 @@ Package manager: **bun** (bun.lock). The root `Dockerfile` builds the frontend i
 
 SvelteKit 2 + Svelte 5 with **runes mode forced on** for all non-`node_modules` files (see `compilerOptions.runes` in `vite.config.ts`). TypeScript strict. Tailwind CSS **v4** via `@tailwindcss/vite` — there is no `tailwind.config.*`; tokens are declared as CSS custom properties + `@theme inline` in `src/routes/layout.css`. shadcn-svelte (style `vega`, base color `mist`, icon library `tabler`) provides UI primitives in `src/lib/components/ui/`. **This is a SPA**: `@sveltejs/adapter-static` with `fallback: 'index.html'` (configured in `vite.config.ts`) and `ssr = false` in `src/routes/+layout.ts`. There is no server runtime, so **never add `+page.server.ts`, `+layout.server.ts`, `hooks.server.ts`, `$env/*/private` or `src/lib/server/`** — they cannot work. Everything runs in the browser.
 
-Path alias: `$lib` → `src/lib` (set in `vite.config.ts`; there is no `svelte.config.js`).
+Import alias: `#lib/*` → `src/lib/*`, a Node subpath import declared in the `imports` field of `package.json` (SvelteKit 3 removed `$lib`; do not re-add `kit.alias`, it is deprecated). Use `#lib/...` for everything under `src/lib`; shadcn-svelte detects it via `components.json`.
 
 Config: `VITE_API_BASE_URL` (see `.env.example`) is the API origin, inlined at build time. Leave empty for same-origin (production and dev proxy).
 
@@ -55,7 +55,7 @@ Domain logic lives under `src/lib/features/<feature>/` with four sub-folders:
 
 - `domain/` — types and repository **interfaces** (e.g. `auth.types.ts` declaring `AuthRepository`). No I/O.
 - `application/` — pure use-cases and constants (`login.use-case.ts`, `auth.constants.ts`). Validation + orchestration; takes a repository as a parameter.
-- `infrastructure/` — repository implementations. Use `api-*.client.ts` (or `*.repository.ts`) built on the shared `api` from `$lib/api/client`, which attaches the bearer token automatically. May also include a `mock-*.repository.ts` for offline/dev.
+- `infrastructure/` — repository implementations. Use `api-*.client.ts` (or `*.repository.ts`) built on the shared `api` from `#lib/api/client`, which attaches the bearer token automatically. May also include a `mock-*.repository.ts` for offline/dev.
 - `components/` — feature-specific Svelte components.
 
 Each feature exposes a single barrel `index.ts` (constants, types, use-cases, repo).

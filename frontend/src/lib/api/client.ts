@@ -1,6 +1,6 @@
 import { goto } from '$app/navigation';
-import { AUTH_ROUTES } from '$lib/features/auth/application/auth.constants.js';
-import { session } from '$lib/features/auth/application/session.svelte.js';
+import { AUTH_ROUTES } from '#lib/features/auth/application/auth.constants.js';
+import { session } from '#lib/features/auth/application/session.svelte.js';
 import { Api } from './api.js';
 
 /**

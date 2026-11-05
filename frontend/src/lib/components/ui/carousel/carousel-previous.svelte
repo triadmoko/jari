@@ -1,7 +1,7 @@
 <script lang="ts">
 	import IconChevronLeft from '@tabler/icons-svelte/icons/chevron-left';
-	import { Button, type Props } from "$lib/components/ui/button/index.js";
-	import { cn } from "$lib/utils.js";
+	import { Button, type Props } from "#lib/components/ui/button/index.js";
+	import { cn } from "#lib/utils.js";
 	import { getEmblaContext } from "./context.js";
 	import type { WithoutChildren } from "bits-ui";
 

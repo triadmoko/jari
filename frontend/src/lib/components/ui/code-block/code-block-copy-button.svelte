@@ -2,8 +2,8 @@
 	import { onDestroy } from "svelte";
 	import IconCheck from '@tabler/icons-svelte/icons/check';
 	import IconCopy from '@tabler/icons-svelte/icons/copy';
-	import { Button, type ButtonProps } from "$lib/components/ui/button/index.js";
-	import { cn } from "$lib/utils.js";
+	import { Button, type ButtonProps } from "#lib/components/ui/button/index.js";
+	import { cn } from "#lib/utils.js";
 
 	let {
 		ref = $bindable(null),

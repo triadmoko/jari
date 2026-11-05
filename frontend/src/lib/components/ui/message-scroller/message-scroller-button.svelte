@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { MessageScroller as MessageScrollerPrimitive } from "@shadcn-svelte/primitives/message-scroller";
 	import IconArrowDown from '@tabler/icons-svelte/icons/arrow-down';
-	import { Button } from "$lib/components/ui/button/index.js";
-	import type { ButtonSize, ButtonVariant } from "$lib/components/ui/button/index.js";
-	import { cn } from "$lib/utils.js";
+	import { Button } from "#lib/components/ui/button/index.js";
+	import type { ButtonSize, ButtonVariant } from "#lib/components/ui/button/index.js";
+	import { cn } from "#lib/utils.js";
 
 	let {
 		ref = $bindable(null),

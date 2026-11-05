@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ContextMenu as ContextMenuPrimitive } from "bits-ui";
 	import IconCheck from '@tabler/icons-svelte/icons/check';
-	import { cn, type WithoutChildrenOrChild } from "$lib/utils.js";
+	import { cn, type WithoutChildrenOrChild } from "#lib/utils.js";
 	import type { Snippet } from "svelte";
 
 	let {

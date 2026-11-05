@@ -2,7 +2,7 @@
 	import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
 	import IconMinus from '@tabler/icons-svelte/icons/minus';
 	import IconCheck from '@tabler/icons-svelte/icons/check';
-	import { cn, type WithoutChildrenOrChild } from "$lib/utils.js";
+	import { cn, type WithoutChildrenOrChild } from "#lib/utils.js";
 	import type { Snippet } from "svelte";
 
 	let {

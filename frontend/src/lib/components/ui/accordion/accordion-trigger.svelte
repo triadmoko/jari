@@ -2,7 +2,7 @@
 	import { Accordion as AccordionPrimitive } from "bits-ui";
 	import IconChevronDown from '@tabler/icons-svelte/icons/chevron-down';
 	import IconChevronUp from '@tabler/icons-svelte/icons/chevron-up';
-	import { cn, type WithoutChild } from "$lib/utils.js";
+	import { cn, type WithoutChild } from "#lib/utils.js";
 
 	let {
 		ref = $bindable(null),

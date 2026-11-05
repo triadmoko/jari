@@ -1,6 +1,6 @@
 <script lang="ts">
 	import IconLoader from '@tabler/icons-svelte/icons/loader';
-	import { cn } from "$lib/utils.js";
+	import { cn } from "#lib/utils.js";
 	import type { SVGAttributes } from "svelte/elements";
 
 	let {

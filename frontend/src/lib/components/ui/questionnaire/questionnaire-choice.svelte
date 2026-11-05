@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Questionnaire as QuestionnairePrimitive } from "@shadcn-svelte/primitives/questionnaire";
 	import IconCheck from '@tabler/icons-svelte/icons/check';
-	import { cn } from "$lib/utils.js";
+	import { cn } from "#lib/utils.js";
 
 	let {
 		ref = $bindable(null),

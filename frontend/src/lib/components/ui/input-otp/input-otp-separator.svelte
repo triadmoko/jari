@@ -1,7 +1,7 @@
 <script lang="ts">
 	import IconMinus from '@tabler/icons-svelte/icons/minus';
-	import type { WithElementRef } from "$lib/utils.js";
-	import { cn } from "$lib/utils.js";
+	import type { WithElementRef } from "#lib/utils.js";
+	import { cn } from "#lib/utils.js";
 	import type { HTMLAttributes } from "svelte/elements";
 
 	let {
