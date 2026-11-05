@@ -1,0 +1,47 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Dependencies
+vendor/
+
+# Test files
+*_test.go
+coverage.out
+
+# Build artifacts
+app
+app_unix
+main
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Frontend build artifacts (built inside the Docker "web" stage)
+frontend/node_modules
+frontend/build
+frontend/.svelte-kit
+internal/shared/delivery/http/webui/dist
