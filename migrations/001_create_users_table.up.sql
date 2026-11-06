@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     name VARCHAR(200) NOT NULL,
     is_active BOOLEAN DEFAULT true
-    
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
