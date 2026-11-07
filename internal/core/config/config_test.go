@@ -181,13 +181,13 @@ func TestLoad_ProductionWithoutOriginsRejectsCrossOrigin(t *testing.T) {
 	assert.Empty(t, cfg.CORS.AllowedOrigins)
 }
 
-func TestLoad_WildcardOriginFails(t *testing.T) {
+func TestLoad_WildcardOriginIsAccepted(t *testing.T) {
 	clearEnv(t)
 	t.Setenv("ENV", "development")
-	t.Setenv("CORS_ALLOWED_ORIGINS", "https://app.example.com,*")
+	t.Setenv("CORS_ALLOWED_ORIGINS", "*")
 
-	_, err := Load()
+	cfg, err := Load()
 
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "CORS_ALLOWED_ORIGINS")
+	require.NoError(t, err)
+	assert.Equal(t, []string{"*"}, cfg.CORS.AllowedOrigins)
 }

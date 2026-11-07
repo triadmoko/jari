@@ -95,3 +95,26 @@ func TestCORS_PreflightFromUnknownOriginHasNoAllowHeaders(t *testing.T) {
 	assert.Empty(t, w.Header().Get("Access-Control-Allow-Origin"))
 	assert.Empty(t, w.Header().Get("Access-Control-Allow-Methods"))
 }
+
+func TestCORS_WildcardAllowsAnyOriginWithoutCredentials(t *testing.T) {
+	r := newCORSRouter([]string{"*"})
+
+	w := doCORS(r, http.MethodGet, "https://anything.example", nil)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "*", w.Header().Get("Access-Control-Allow-Origin"))
+	assert.Empty(t, w.Header().Get("Access-Control-Allow-Credentials"))
+}
+
+func TestCORS_WildcardPreflightForPatchPasses(t *testing.T) {
+	r := newCORSRouter([]string{"*"})
+
+	w := doCORS(r, http.MethodOptions, "https://anything.example", map[string]string{
+		"Access-Control-Request-Method": http.MethodPatch,
+	})
+
+	assert.Equal(t, http.StatusNoContent, w.Code)
+	assert.Equal(t, "*", w.Header().Get("Access-Control-Allow-Origin"))
+	assert.Contains(t, w.Header().Get("Access-Control-Allow-Methods"), "PATCH")
+	assert.Contains(t, w.Header().Get("Access-Control-Allow-Headers"), "Authorization")
+}

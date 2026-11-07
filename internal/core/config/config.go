@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"slices"
 	"strings"
 )
 
@@ -68,6 +67,7 @@ type JWTConfig struct {
 // CORSConfig holds the cross-origin allowlist.
 type CORSConfig struct {
 	// AllowedOrigins lists the origins permitted to make cross-origin requests.
+	// A "*" entry allows every origin (without credentials).
 	// Empty means every cross-origin request is rejected (same-origin still works).
 	AllowedOrigins []string
 }
@@ -147,9 +147,6 @@ func (c *Config) validateCORS() error {
 		c.CORS.AllowedOrigins = append([]string(nil), developmentCORSOrigins...)
 	}
 
-	if slices.Contains(c.CORS.AllowedOrigins, "*") {
-		return errors.New("CORS_ALLOWED_ORIGINS must list explicit origins, \"*\" is not allowed because credentials are enabled")
-	}
 	return nil
 }
 
