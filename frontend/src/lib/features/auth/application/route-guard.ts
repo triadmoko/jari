@@ -13,12 +13,9 @@ export function safeRedirectTarget(value: string | null | undefined): string | n
 	return value;
 }
 
-/** Where to go after a successful login: admins -> /admin, others -> / (or redirectTo). */
-export function postLoginTarget(session: Session, redirectTo?: string | null): string {
-	return (
-		safeRedirectTarget(redirectTo) ??
-		(session.user.role === 'admin' ? AUTH_ROUTES.admin : AUTH_ROUTES.home)
-	);
+/** Where to go after a successful login: a safe redirectTo, otherwise home. */
+export function postLoginTarget(redirectTo?: string | null): string {
+	return safeRedirectTarget(redirectTo) ?? AUTH_ROUTES.home;
 }
 
 /**

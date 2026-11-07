@@ -67,8 +67,8 @@ When adding a feature, mirror this shape and keep use-cases free of HTTP/SDK cal
 
 - Session `{ token, user, expiresAt }` is stored in `localStorage` under `jari_session` (`src/lib/features/auth/infrastructure/session.storage.ts`; reads/writes are try/catch-guarded and expired or malformed data is dropped). TTL is a **sliding 12h** window, refreshed on each authenticated API request.
 - Reactive state is the `session` store in `application/session.svelte.ts` (`session.login(token, user)`, `session.logout()`, `session.token`, `session.user`). `login` receives `token` and `user` (incl. `role`) from `POST /api/v1/auth/login`.
-- Route guards run client-side in `src/routes/+layout.ts` via the pure `resolveGuard()` in `application/route-guard.ts`: `PROTECTED_PREFIXES = ['/admin', '/profile']` redirect to `/auth/login?redirectTo=…` when logged out; `GUEST_ONLY_PATHS = ['/auth/login']` redirect to `AUTH_ROUTES.home` when logged in. This is UX only — the backend enforces auth.
-- After login use `postLoginTarget(session, redirectTo)`: a safe `redirectTo` wins, otherwise admins → `/admin`, others → `/`. Always pass `redirectTo` through `safeRedirectTarget` (blocks open redirects).
+- Route guards run client-side in `src/routes/+layout.ts` via the pure `resolveGuard()` in `application/route-guard.ts`: `PROTECTED_PREFIXES = ['/admin', '/profile']` redirect to `/auth/login?redirectTo=…` when logged out; `GUEST_ONLY_PATHS = ['/auth/login', '/auth/register']` redirect to `AUTH_ROUTES.home` when logged in. This is UX only — the backend enforces auth.
+- After login use `postLoginTarget(redirectTo)`: a safe `redirectTo` wins, otherwise `/`. Always pass `redirectTo` through `safeRedirectTarget` (blocks open redirects). `/admin` is protected but has no page yet (the old admin stub was removed); route admins there once it exists.
 - `localStorage` is readable by any XSS, so keep dependencies lean and never render untrusted HTML.
 
 ### API client
@@ -77,7 +77,11 @@ When adding a feature, mirror this shape and keep use-cases free of HTTP/SDK cal
 
 ### Routes
 
-`(guest)` is a layout group for the public landing page. `admin/` and `profile/` are protected by the client-side guard in `+layout.ts`. All data fetching happens in the browser through the shared `api` client. Unknown paths are served `index.html` by the backend (and by `adapter-static`'s fallback) and resolved by the client router.
+Flat route tree (no `(guest)` group — guarding is path-based in `+layout.ts`): `/` (home, public; greets the user when logged in), `/auth/login`, `/auth/register`, `/profile` (protected), plus `+error.svelte`. `/admin` is reserved/protected but has no page yet. Route files stay thin and render feature components (`features/auth/components/{login,register}-form.svelte`, `features/profile/components/profile-form.svelte`); shared field markup is `components/form-field.svelte`, the top bar is `components/app-header.svelte`. All data fetching happens in the browser through the shared `api` client. Unknown paths are served `index.html` by the backend (and by `adapter-static`'s fallback) and resolved by the client router.
+
+### Errors & forms
+
+`src/lib/api/result.ts` holds the shared `Result<T>` / `Failure` types and `toFailure()`, which maps axios errors (400/422 → `VALIDATION_ERROR` with per-field `fieldErrors` from the backend `errors` map, 401 → `UNAUTHORIZED` or `INVALID_CREDENTIALS` for login, 403 → `FORBIDDEN`, anything else/network → `UNKNOWN_ERROR`) to Indonesian messages. Use cases validate locally first (mirroring the backend rules) and only then call the repository; forms render `fieldErrors` inline and everything else in a destructive `Alert`.
 
 ## Conventions
 

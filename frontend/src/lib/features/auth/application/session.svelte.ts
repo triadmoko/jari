@@ -25,6 +25,14 @@ class SessionStore {
 		return session;
 	}
 
+	/** Replace the stored user (e.g. after a profile update) without touching token or expiry. */
+	updateUser(user: SessionUser): void {
+		if (!this.#session) return;
+		const session = { ...this.#session, user };
+		writeSession(session);
+		this.#session = session;
+	}
+
 	/** Slide the expiry window forward (called on authenticated API activity). */
 	touch(): void {
 		if (!this.#session) return;

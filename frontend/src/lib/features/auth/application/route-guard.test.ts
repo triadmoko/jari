@@ -24,13 +24,15 @@ describe('resolveGuard', () => {
 		expect(resolveGuard('/admin', '', session())).toBeNull();
 	});
 
-	it('sends logged-in users away from the login page', () => {
+	it('sends logged-in users away from the guest pages', () => {
 		expect(resolveGuard('/auth/login', '', session())).toBe('/');
+		expect(resolveGuard('/auth/register', '', session())).toBe('/');
 	});
 
 	it('allows public routes for everyone', () => {
 		expect(resolveGuard('/', '', null)).toBeNull();
 		expect(resolveGuard('/auth/login', '', null)).toBeNull();
+		expect(resolveGuard('/auth/register', '', null)).toBeNull();
 	});
 });
 
@@ -47,10 +49,10 @@ describe('safeRedirectTarget', () => {
 
 describe('postLoginTarget', () => {
 	it('prefers a safe redirectTo', () => {
-		expect(postLoginTarget(session('admin'), '/profile')).toBe('/profile');
+		expect(postLoginTarget('/profile')).toBe('/profile');
 	});
-	it('falls back by role', () => {
-		expect(postLoginTarget(session('admin'), '//evil.com')).toBe('/admin');
-		expect(postLoginTarget(session('user'))).toBe('/');
+	it('falls back to home for missing or unsafe targets', () => {
+		expect(postLoginTarget('//evil.com')).toBe('/');
+		expect(postLoginTarget()).toBe('/');
 	});
 });

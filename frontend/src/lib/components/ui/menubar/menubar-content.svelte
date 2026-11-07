@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { Menubar as MenubarPrimitive } from "bits-ui";
-	import { cn, type WithoutChildrenOrChild } from "#lib/utils.js";
-	import MenubarPortal from "./menubar-portal.svelte";
-	import type { ComponentProps } from "svelte";
+	import { Menubar as MenubarPrimitive } from 'bits-ui';
+	import { cn, type WithoutChildrenOrChild } from '#lib/utils.js';
+	import MenubarPortal from './menubar-portal.svelte';
+	import type { ComponentProps } from 'svelte';
 
 	let {
 		ref = $bindable(null),
 		class: className,
 		sideOffset = 8,
 		alignOffset = -4,
-		align = "start",
-		side = "bottom",
+		align = 'start',
+		side = 'bottom',
 		portalProps,
 		...restProps
 	}: MenubarPrimitive.ContentProps & {
@@ -27,7 +27,7 @@
 		{side}
 		{sideOffset}
 		class={cn(
-			"bg-popover text-popover-foreground data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 ring-foreground/5 min-w-48 rounded-2xl p-1 shadow-2xl ring-1 duration-100 z-50 origin-(--bits-menubar-content-transform-origin) overflow-hidden",
+			'z-50 min-w-48 origin-(--bits-menubar-content-transform-origin) overflow-hidden rounded-2xl bg-popover p-1 text-popover-foreground shadow-2xl ring-1 ring-foreground/5 duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95',
 			className
 		)}
 		{...restProps}
