@@ -17,7 +17,8 @@ func runMigrate(args []string) error {
 		return err
 	}
 
-	db, err := database.NewPostgresDB(config.Parse().Database)
+	cfg := config.Parse()
+	db, err := database.NewPostgresDB(cfg.Database, database.GormLogLevel(cfg.Env, cfg.Log.Level))
 	if err != nil {
 		return err
 	}

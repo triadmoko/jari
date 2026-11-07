@@ -1,12 +1,14 @@
 package app
 
 import (
+	"context"
 	"fmt"
 
 	"app/internal/core/config"
 	"app/internal/features/auth"
 	"app/internal/features/user"
 	"app/internal/shared/delivery/http/apidocs"
+	"app/internal/shared/delivery/http/health"
 	"app/internal/shared/delivery/http/middleware"
 	"app/internal/shared/delivery/http/webui"
 	"app/internal/shared/infrastructure/database"
@@ -48,10 +50,11 @@ func New() (*App, error) {
 	}
 	app.Config = cfg
 
-	app.Logger = logger.NewLogger()
+	// JSON logs in production, colored text otherwise; LOG_LEVEL sets verbosity.
+	app.Logger = logger.NewLogger(cfg.Log.Level, cfg.JSONLogs())
 
 	// Initialize database
-	db, err := database.NewPostgresDB(cfg.Database)
+	db, err := database.NewPostgresDB(cfg.Database, database.GormLogLevel(cfg.Env, cfg.Log.Level))
 	if err != nil {
 		return nil, err
 	}
@@ -80,18 +83,14 @@ func (a *App) setupRouter() *gin.Engine {
 	router := gin.New()
 
 	// Global middleware
-	router.Use(middleware.LoggerMiddleware())
-	router.Use(gin.Recovery())
+	router.Use(middleware.RequestIDMiddleware()) // first: every later log line needs the ID
+	router.Use(middleware.LoggerMiddleware(a.Logger))
+	router.Use(middleware.RecoveryMiddleware(a.Logger))
 	router.Use(middleware.CORSMiddleware(a.Config.CORS.AllowedOrigins))
 	router.Use(middleware.LanguageMiddleware())
 
-	// Health check endpoint
-	router.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"status":  "ok",
-			"message": "Service is running",
-		})
-	})
+	// Health probes: /health/live (process), /health/ready (DB + schema), /health (alias of live)
+	health.New(a.Logger, a.readinessChecks()...).RegisterRoutes(router)
 
 	// API v1 routes
 	v1 := router.Group("/api/v1")
@@ -116,6 +115,27 @@ func (a *App) setupRouter() *gin.Engine {
 	webui.RegisterRoutes(router)
 
 	return router
+}
+
+// readinessChecks lists what must work before the app can serve traffic: the
+// database answers, and its schema is at the migration version embedded in the binary.
+func (a *App) readinessChecks() []health.Check {
+	return []health.Check{
+		{Name: "database", Fn: func(ctx context.Context) error {
+			sqlDB, err := a.DB.GetDB().DB()
+			if err != nil {
+				return err
+			}
+			return sqlDB.PingContext(ctx)
+		}},
+		{Name: "migrations", Fn: func(context.Context) error {
+			sqlDB, err := a.DB.GetDB().DB()
+			if err != nil {
+				return err
+			}
+			return migrator.CheckSchema(sqlDB, migrations.FS)
+		}},
+	}
 }
 
 // Close releases all resources held by the application

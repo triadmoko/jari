@@ -13,7 +13,7 @@ func clearEnv(t *testing.T) {
 	for _, k := range []string{
 		"ENV", "SERVER_PORT", "SERVER_HOST", "DATABASE_URL",
 		"DB_HOST", "DB_PORT", "DB_USER", "DB_PASS", "DB_NAME", "DB_SSLMODE", "JWT_SECRET",
-		"CORS_ALLOWED_ORIGINS",
+		"CORS_ALLOWED_ORIGINS", "LOG_LEVEL",
 	} {
 		t.Setenv(k, "")
 	}
@@ -190,4 +190,36 @@ func TestLoad_WildcardOriginIsAccepted(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, []string{"*"}, cfg.CORS.AllowedOrigins)
+}
+
+func TestLoad_LogLevel(t *testing.T) {
+	t.Run("defaults to empty", func(t *testing.T) {
+		clearEnv(t)
+		cfg, err := Load()
+		require.NoError(t, err)
+		assert.Empty(t, cfg.Log.Level)
+	})
+
+	t.Run("is normalized", func(t *testing.T) {
+		clearEnv(t)
+		t.Setenv("LOG_LEVEL", " DEBUG ")
+		cfg, err := Load()
+		require.NoError(t, err)
+		assert.Equal(t, "debug", cfg.Log.Level)
+	})
+
+	t.Run("rejects unknown value", func(t *testing.T) {
+		clearEnv(t)
+		t.Setenv("LOG_LEVEL", "verbose")
+		cfg, err := Load()
+		require.Error(t, err)
+		assert.Nil(t, cfg)
+		assert.Contains(t, err.Error(), "LOG_LEVEL")
+	})
+}
+
+func TestJSONLogs(t *testing.T) {
+	assert.True(t, (&Config{Env: EnvProduction}).JSONLogs())
+	assert.False(t, (&Config{Env: EnvDevelopment}).JSONLogs())
+	assert.False(t, (&Config{Env: EnvTest}).JSONLogs())
 }

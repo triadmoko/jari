@@ -15,8 +15,30 @@ type PostgresDB struct {
 	DB *gorm.DB
 }
 
-// NewPostgresDB creates a new PostgreSQL database connection using GORM
-func NewPostgresDB(cfg config.DatabaseConfig) (*PostgresDB, error) {
+// GormLogLevel picks the GORM logger verbosity. An explicit LOG_LEVEL wins:
+// debug/trace log every SQL statement, info/warn log slow queries and errors,
+// error logs errors only, fatal/panic are silent. Without LOG_LEVEL, development
+// logs every statement and every other environment logs slow queries and errors.
+func GormLogLevel(env, logLevel string) logger.LogLevel {
+	switch logLevel {
+	case "trace", "debug":
+		return logger.Info
+	case "info", "warn", "warning":
+		return logger.Warn
+	case "error":
+		return logger.Error
+	case "fatal", "panic":
+		return logger.Silent
+	}
+	if env == config.EnvDevelopment {
+		return logger.Info
+	}
+	return logger.Warn
+}
+
+// NewPostgresDB creates a new PostgreSQL database connection using GORM.
+// gormLevel sets the verbosity of GORM's own logger (see GormLogLevel).
+func NewPostgresDB(cfg config.DatabaseConfig, gormLevel logger.LogLevel) (*PostgresDB, error) {
 	dsn := cfg.URL
 	if dsn == "" {
 		dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
@@ -24,7 +46,7 @@ func NewPostgresDB(cfg config.DatabaseConfig) (*PostgresDB, error) {
 	}
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+		Logger: logger.Default.LogMode(gormLevel),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)

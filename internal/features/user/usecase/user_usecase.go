@@ -41,7 +41,7 @@ func (u *userUsecase) GetProfile(ctx context.Context, userID string) (*dto_user.
 
 	user, err := u.userRepo.GetByID(ctx, userID)
 	if err != nil {
-		u.logger.Error("u.userRepo.GetByID ", err)
+		u.logger.WithContext(ctx).Error("u.userRepo.GetByID ", err)
 		return nil, http.StatusNotFound, constants.GetError(constants.UserNotFound, lang)
 	}
 
@@ -55,7 +55,7 @@ func (u *userUsecase) UpdateProfile(ctx context.Context, userID string, req *dto
 
 	user, err := u.userRepo.GetByID(ctx, userID)
 	if err != nil {
-		u.logger.Error("u.userRepo.GetByID ", err)
+		u.logger.WithContext(ctx).Error("u.userRepo.GetByID ", err)
 		return nil, http.StatusNotFound, constants.GetError(constants.UserNotFound, lang)
 	}
 
@@ -71,7 +71,7 @@ func (u *userUsecase) UpdateProfile(ctx context.Context, userID string, req *dto
 
 	// Save updated user
 	if err := u.userRepo.Update(ctx, filter, user); err != nil {
-		u.logger.Error("u.userRepo.Update ", err)
+		u.logger.WithContext(ctx).Error("u.userRepo.Update ", err)
 		return nil, http.StatusInternalServerError, constants.GetError(constants.FailedToUpdateUser, lang)
 	}
 
@@ -107,7 +107,7 @@ func (u *userUsecase) GetUsers(ctx context.Context, queries map[string]string) (
 	// Get users from repository
 	users, total, err := u.userRepo.List(ctx, filter)
 	if err != nil {
-		u.logger.Error("u.userRepo.List ", err)
+		u.logger.WithContext(ctx).Error("u.userRepo.List ", err)
 		return nil, pkg.PaginationResponse{}, http.StatusInternalServerError, constants.GetError(constants.FailedToGetUsers, lang)
 	}
 

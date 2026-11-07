@@ -40,6 +40,7 @@ type Config struct {
 	Database DatabaseConfig
 	JWT      JWTConfig
 	CORS     CORSConfig
+	Log      LogConfig
 }
 
 // ServerConfig holds server configuration
@@ -71,6 +72,24 @@ type CORSConfig struct {
 	// Empty means every cross-origin request is rejected (same-origin still works).
 	AllowedOrigins []string
 }
+
+// LogConfig holds logging configuration.
+type LogConfig struct {
+	// Level is the LOG_LEVEL value (trace|debug|info|warn|error|fatal|panic),
+	// lowercased. Empty means "not set": the app logs at info and the GORM
+	// logger picks a level from ENV.
+	Level string
+}
+
+// validLogLevels are the accepted LOG_LEVEL values.
+var validLogLevels = map[string]struct{}{
+	"trace": {}, "debug": {}, "info": {}, "warn": {}, "warning": {},
+	"error": {}, "fatal": {}, "panic": {},
+}
+
+// JSONLogs reports whether logs are written as JSON (production) instead of
+// the colored text used for local development.
+func (c *Config) JSONLogs() bool { return c.IsProduction() }
 
 // IsDevelopment reports whether the app runs with ENV=development.
 func (c *Config) IsDevelopment() bool { return c.Env == EnvDevelopment }
@@ -104,6 +123,9 @@ func Parse() *Config {
 		},
 		CORS: CORSConfig{
 			AllowedOrigins: getEnvList("CORS_ALLOWED_ORIGINS"),
+		},
+		Log: LogConfig{
+			Level: strings.ToLower(strings.TrimSpace(getEnv("LOG_LEVEL", ""))),
 		},
 	}
 }
@@ -139,7 +161,21 @@ func (c *Config) Validate() error {
 		errs = append(errs, err)
 	}
 
+	if err := c.validateLog(); err != nil {
+		errs = append(errs, err)
+	}
+
 	return errors.Join(errs...)
+}
+
+func (c *Config) validateLog() error {
+	if c.Log.Level == "" {
+		return nil
+	}
+	if _, ok := validLogLevels[c.Log.Level]; !ok {
+		return fmt.Errorf("LOG_LEVEL %q is invalid: must be one of trace, debug, info, warn, error, fatal, panic", c.Log.Level)
+	}
+	return nil
 }
 
 func (c *Config) validateCORS() error {

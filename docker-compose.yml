@@ -38,6 +38,11 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     networks:
       - jari-network
 
@@ -69,13 +74,21 @@ services:
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in .env (openssl rand -hex 32)}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
       ENV: production
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    # Readiness: 200 only while the DB answers and the schema is fully migrated
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO /dev/null http://127.0.0.1:$${SERVER_PORT}/health/ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     depends_on:
       postgres:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
       redis:
-        condition: service_started
+        condition: service_healthy
     networks:
       - jari-network
     restart: unless-stopped

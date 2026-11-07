@@ -43,21 +43,21 @@ func (a *authUsecase) Register(ctx context.Context, req dto_auth.RegisterRequest
 	// Check if user already exists by email
 	existingUser, _ := a.userRepo.GetByEmail(ctx, req.Email)
 	if existingUser != nil {
-		a.logger.Error("a.userRepo.GetByEmail: user already exists")
+		a.logger.WithContext(ctx).Error("a.userRepo.GetByEmail: user already exists")
 		return nil, http.StatusBadRequest, constants.GetError(constants.UserAlreadyExists, lang)
 	}
 
 	// Check if username is taken
 	existingUser, _ = a.userRepo.GetByUsername(ctx, req.Username)
 	if existingUser != nil {
-		a.logger.Error("a.userRepo.GetByUsername: username already taken")
+		a.logger.WithContext(ctx).Error("a.userRepo.GetByUsername: username already taken")
 		return nil, http.StatusBadRequest, constants.GetError(constants.UsernameAlreadyTaken, lang)
 	}
 
 	// Hash password
 	hashedPassword, err := crypto.HashPassword(req.Password)
 	if err != nil {
-		a.logger.Error("crypto.HashPassword ", err)
+		a.logger.WithContext(ctx).Error("crypto.HashPassword ", err)
 		return nil, http.StatusInternalServerError, constants.GetError(constants.FailedToHashPassword, lang)
 	}
 
@@ -66,7 +66,7 @@ func (a *authUsecase) Register(ctx context.Context, req dto_auth.RegisterRequest
 
 	// Save user
 	if err := a.userRepo.Create(ctx, user); err != nil {
-		a.logger.Error("a.userRepo.Create ", err)
+		a.logger.WithContext(ctx).Error("a.userRepo.Create ", err)
 		return nil, http.StatusInternalServerError, constants.GetError(constants.FailedToCreateUser, lang)
 	}
 
@@ -81,13 +81,13 @@ func (a *authUsecase) Login(ctx context.Context, req dto_auth.LoginRequest) (*dt
 	// Get user by email
 	user, err := a.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
-		a.logger.Error("a.userRepo.GetByEmail ", err)
+		a.logger.WithContext(ctx).Error("a.userRepo.GetByEmail ", err)
 		return nil, http.StatusUnauthorized, constants.GetError(constants.InvalidCredentials, lang)
 	}
 
 	// Verify password
 	if err := crypto.VerifyPassword(user.Password, req.Password); err != nil {
-		a.logger.Error("crypto.VerifyPassword ", err)
+		a.logger.WithContext(ctx).Error("crypto.VerifyPassword ", err)
 		return nil, http.StatusUnauthorized, constants.GetError(constants.InvalidCredentials, lang)
 	}
 
@@ -98,7 +98,7 @@ func (a *authUsecase) Login(ctx context.Context, req dto_auth.LoginRequest) (*dt
 		Username: user.Username,
 	})
 	if err != nil {
-		a.logger.Error("jwt.GenerateToken ", err)
+		a.logger.WithContext(ctx).Error("jwt.GenerateToken ", err)
 		return nil, http.StatusInternalServerError, constants.GetError(constants.FailedToGenerateToken, lang)
 	}
 
