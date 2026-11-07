@@ -1,8 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "A REST API built with Go and Clean Architecture",
-        "title": "Backend API",
+        "description": "REST API for Jari, an open-source work and project management platform (Jira clone). \"Jari\" is the working name until the final product name is decided.",
+        "title": "Jari API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",

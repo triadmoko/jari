@@ -1,175 +1,130 @@
-# Go Project Template
+# Jari
 
-A production-ready Go REST API template with Clean Architecture and feature-based modular design.
+Jari adalah platform manajemen kerja dan proyek open-source yang meniru fitur inti Jira: proyek, work item, board, backlog dan sprint, workflow, pencarian (JQL), laporan, dan administrasi. "Jari" adalah **nama kerja** sampai nama produk final ditetapkan.
 
-## Features
+Proyek ini masih dalam tahap awal (Sprint 0, remediasi baseline). Ruang lingkup, fase delivery, dan keputusan teknis ada di dokumen berikut:
 
-- Clean Architecture with feature-based modules
-- JWT authentication
-- PostgreSQL with GORM
-- Structured logging (Logrus)
-- Docker support
-- Swagger documentation
-- Database migrations
-- Multi-language error messages (EN/ID)
+- [PRD](docs/prd/README.md): visi, ruang lingkup per fase, dan spesifikasi fitur per modul. Mulai dari [modul 00](docs/prd/00-visi-ruang-lingkup-glosarium-baseline.md).
+- [ADR](docs/adr/README.md): catatan keputusan teknis beserta alasannya.
+- Pelacakan pekerjaan: project **KAN** di Jira (`triadmoko.atlassian.net`).
 
-## Table of Contents
+## Stack
 
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [Configuration](#configuration)
-- [API Endpoints](#api-endpoints)
-- [Project Structure](#project-structure)
-- [Development Commands](#development-commands)
-- [Docker](#docker)
-- [Adding New Features](#adding-new-features)
-- [Tech Stack](#tech-stack)
-- [License](#license)
+| Komponen | Teknologi |
+|----------|-----------|
+| Backend | Go 1.26, [Gin](https://github.com/gin-gonic/gin), [GORM](https://gorm.io) |
+| Database | PostgreSQL 15+, migrasi dengan [golang-migrate](https://github.com/golang-migrate/migrate) |
+| Queue / job latar | Redis 7 dengan `asynq` ([ADR-0004](docs/adr/0004-job-latar-dan-queue.md)); belum dipakai kode |
+| Autentikasi | JWT ([golang-jwt](https://github.com/golang-jwt/jwt) v5), password bcrypt |
+| Frontend | SvelteKit (SPA statis) di `frontend/`, di-embed ke binary Go |
+| Dokumentasi API | Swagger ([swag](https://github.com/swaggo/swag)) dengan UI Scalar |
+| Logging | [Logrus](https://github.com/sirupsen/logrus) |
 
-## Prerequisites
+Arsitektur backend memakai Clean Architecture dengan modul per fitur. Panduan lengkap untuk kontributor ada di [CLAUDE.md](CLAUDE.md).
+
+## Prasyarat
 
 - Go 1.26+
 - PostgreSQL 15+
-- [golang-migrate](https://github.com/golang-migrate/migrate) CLI (only for `make migration-create`)
-- Docker & Docker Compose (optional)
-- [gow](https://github.com/mitranim/gow) for hot-reload in development (optional)
+- [bun](https://bun.sh) untuk membangun frontend
+- Docker dan Docker Compose (opsional, untuk menjalankan semua layanan)
+- [gow](https://github.com/mitranim/gow) untuk hot-reload (opsional)
+- [migrate CLI](https://github.com/golang-migrate/migrate) (hanya untuk `make migration-create`)
+- [swag](https://github.com/swaggo/swag) (hanya untuk `make swag`)
 
-## Quick Start
+## Menjalankan
+
+### Dengan Docker
 
 ```bash
-# Clone the repository
-git clone <repo-url>
-cd golang-project-template
-
-# Setup environment
 cp .env.example .env
-# Edit .env with your configuration
-
-# Option 1: Docker (recommended)
-docker-compose up -d
-
-# Option 2: Manual setup
-make migration-up
-make dev
+# isi JWT_SECRET (openssl rand -hex 32) dan DB_PASS di .env
+docker compose up -d
 ```
 
-The API will be available at `http://localhost:8080`.
+Compose menjalankan `postgres`, `redis`, job `migrate` satu kali (menerapkan migrasi), lalu `app`. API tersedia di `http://localhost:8080`.
 
-## Configuration
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `SERVER_PORT` | HTTP server port | `8080` |
-| `SERVER_HOST` | Server host | `0.0.0.0` |
-| `DB_HOST` | PostgreSQL host | `localhost` |
-| `DB_PORT` | PostgreSQL port | `5432` |
-| `DB_USER` | Database user | `postgres` |
-| `DB_PASS` | Database password | `password` |
-| `DB_NAME` | Database name | `db_name` |
-| `DB_SSLMODE` | SSL mode | `disable` |
-| `JWT_SECRET` | JWT signing key. Required unless `ENV=development`; the server refuses to start if it is empty or a placeholder such as `your-secret-key` | *(required)* |
-| `CORS_ALLOWED_ORIGINS` | Comma-separated browser origins allowed to call the API (`*` allows every origin, without credentials). Empty rejects all cross-origin requests; the embedded SPA is same-origin and unaffected. In `development`, empty allows `http://localhost:5173` | *(empty)* |
-| `ENV` | `development`, `production`, or `test` | `development` |
-
-Configuration is loaded and validated once in `app.New()` and injected into components. `docker compose` reads `DB_PASS` and `JWT_SECRET` from `.env`.
-
-## API Endpoints
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|:----:|-------------|
-| `POST` | `/api/v1/auth/register` | No | Register new user |
-| `POST` | `/api/v1/auth/login` | No | Login, returns JWT token |
-| `GET` | `/api/v1/users/profile` | Yes | Get authenticated user profile |
-| `PUT` | `/api/v1/users/profile` | Yes | Update user profile |
-| `GET` | `/api/v1/users` | Yes | List users (paginated) |
-| `GET` | `/health` | No | Health check |
-| `GET` | `/swagger/index.html` | No | Scalar API reference UI (spec: `/swagger/doc.json`) |
-
-**Authentication**: Include JWT token in header: `Authorization: Bearer <token>`
-
-## Project Structure
-
-```
-├── cmd/api/                  # Application entry point
-├── internal/
-│   ├── app/                  # App initialization and routing
-│   ├── core/config/          # Configuration management
-│   ├── features/             # Feature-based modules
-│   │   ├── auth/             # Authentication feature
-│   │   │   ├── delivery/     # HTTP handlers & DTOs
-│   │   │   └── usecase/      # Business logic
-│   │   └── user/             # User management feature
-│   │       ├── delivery/     # HTTP handlers & DTOs
-│   │       └── usecase/      # Business logic
-│   └── shared/               # Shared components
-│       ├── domain/           # Entities, repository interfaces, errors
-│       ├── infrastructure/   # Database, repository implementations
-│       └── delivery/http/    # Middleware, response utilities
-├── pkg/                      # Reusable packages
-│   ├── jwt/                  # JWT utilities
-│   ├── crypto/               # Password hashing
-│   └── logger/               # Structured logging
-├── migrations/               # SQL migration files (embedded into the binary)
-└── docs/                     # Swagger documentation
-```
-
-## Development Commands
-
-| Command | Description |
-|---------|-------------|
-| `make dev` | Run with hot-reload (requires gow) |
-| `make migration-up` | Run all pending migrations |
-| `make migration-down [n=N\|all]` | Rollback last migration (or N / all) |
-| `make migration-create name=xxx` | Create a new migration |
-| `make migration-force version=N` | Force migration version |
-| `make migration-version` | Show current migration version |
-| `make swag` | Generate Swagger documentation |
-
-## Docker
+### Tanpa Docker (pengembangan lokal)
 
 ```bash
-# Start all services
-docker-compose up -d
-
-# View application logs
-docker-compose logs -f app
-
-# Stop all services
-docker-compose down
+cp .env.example .env     # sesuaikan koneksi database
+make migration-up        # terapkan migrasi
+make dev                 # backend dengan hot-reload (butuh gow)
+make web-dev             # opsional: Vite dev server, proxy /api ke :8080
 ```
 
-**Services:**
-- `app` - Go application (port 8080)
-- `postgres` - PostgreSQL database (port 5432)
-- `redis` - Redis cache (port 6379)
+Untuk satu binary berisi backend dan frontend: `make build`, lalu jalankan `./main`.
 
-## Adding New Features
+### Migrasi
 
-1. **Create feature directory**
-   ```bash
-   mkdir -p internal/features/myfeature/{delivery/http/{handler,dto},usecase}
-   ```
+File SQL ada di `migrations/` (`NNN_nama.up.sql` / `.down.sql`) dan ter-embed di binary. Server menolak start jika skema belum termigrasi, kotor, atau lebih baru dari binary.
 
-2. **Implement layers**
-   - `domain/` - Entities and repository interfaces (in shared or feature-specific)
-   - `usecase/` - Business logic
-   - `delivery/http/` - HTTP handlers and DTOs
+```bash
+make migration-up                    # terapkan semua migrasi
+make migration-down n=1              # mundur N migrasi (n=all untuk semuanya)
+make migration-version               # versi saat ini
+make migration-create name=xxx       # buat file migrasi baru
+make migration-force version=N       # paksa versi (untuk memulihkan status kotor)
+```
 
-3. **Create module** with dependency wiring
+## Konfigurasi
 
-4. **Register** the module in `internal/app/app.go`
+Semua konfigurasi dibaca dari environment variable (lihat `.env.example`).
 
-## Tech Stack
+| Variabel | Keterangan | Default |
+|----------|------------|---------|
+| `SERVER_HOST` / `SERVER_PORT` | Alamat dan port HTTP | `0.0.0.0` / `8080` |
+| `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME`, `DB_SSLMODE` | Koneksi PostgreSQL | `localhost`, `5432`, `postgres`, `password`, `db_name`, `disable` |
+| `DATABASE_URL` | Connection string tunggal, lebih diutamakan daripada variabel `DB_*` | kosong |
+| `JWT_SECRET` | Kunci tanda tangan JWT. Wajib kecuali `ENV=development`; server menolak start jika kosong atau berupa placeholder | wajib |
+| `CORS_ALLOWED_ORIGINS` | Origin browser yang boleh memanggil API, dipisah koma (`*` mengizinkan semua tanpa kredensial). Kosong menolak semua permintaan lintas origin; SPA yang di-embed same-origin tidak terpengaruh. Pada `development`, kosong mengizinkan `http://localhost:5173` | kosong |
+| `ENV` | `development`, `production`, atau `test` | `development` |
 
-| Component | Technology |
-|-----------|------------|
-| Framework | [Gin](https://github.com/gin-gonic/gin) v1.11 |
-| ORM | [GORM](https://gorm.io) v1.25 |
-| Database | PostgreSQL |
-| Authentication | JWT ([golang-jwt](https://github.com/golang-jwt/jwt) v5) |
-| Logging | [Logrus](https://github.com/sirupsen/logrus) |
-| Documentation | [Swagger](https://github.com/swaggo/swag) |
+## API
 
-## License
+Semua rute berada di bawah `/api/v1`. Dokumentasi interaktif (Scalar) ada di `http://localhost:8080/swagger/index.html`, spesifikasinya di `/swagger/doc.json`. Setelah mengubah anotasi API, jalankan `make swag`.
 
-MIT License
+| Method | Endpoint | Auth | Keterangan |
+|--------|----------|:----:|------------|
+| `POST` | `/api/v1/auth/register` | Tidak | Daftar pengguna baru |
+| `POST` | `/api/v1/auth/login` | Tidak | Login, mengembalikan JWT |
+| `GET` | `/api/v1/users/profile` | Ya | Profil pengguna terautentikasi |
+| `PUT` | `/api/v1/users/profile` | Ya | Perbarui profil |
+| `GET` | `/api/v1/users` | Admin | Daftar pengguna (paginasi) |
+| `GET` | `/health` | Tidak | Health check |
+
+Autentikasi memakai header `Authorization: Bearer <token>`.
+
+## Struktur repo
+
+```
+├── cmd/api/              # Entry point (server dan subcommand migrate)
+├── internal/
+│   ├── app/              # Inisialisasi aplikasi dan routing
+│   ├── core/config/      # Pemuatan dan validasi konfigurasi
+│   ├── features/         # Modul fitur (auth, user)
+│   └── shared/           # Domain, infrastruktur, middleware, response, webui
+├── pkg/                  # Paket reusable (jwt, crypto, logger, pagination)
+├── migrations/           # Migrasi SQL (ter-embed ke binary)
+├── frontend/             # SvelteKit SPA
+└── docs/
+    ├── prd/              # Product Requirements Document
+    ├── adr/              # Architecture Decision Records
+    └── (swagger)         # Hasil generate swag
+```
+
+## Perintah pengembangan
+
+| Perintah | Keterangan |
+|----------|------------|
+| `make dev` | Jalankan backend dengan hot-reload |
+| `make test` | Jalankan semua test |
+| `make test-coverage` / `make test-coverage-report` | Laporan coverage (HTML / terminal) |
+| `make swag` | Generate ulang dokumentasi Swagger |
+| `make mock-gen` | Generate mock dengan mockery |
+| `make web-dev` / `make web-build` | Frontend: dev server / build ke dalam binary |
+| `make build` | Build frontend lalu binary Go |
+
+## Lisensi
+
+Lisensi proyek dan nama final produk masih keputusan terbuka (lihat [PRD modul 00](docs/prd/00-visi-ruang-lingkup-glosarium-baseline.md)). Sampai ditetapkan, berkas ini belum menyertakan lisensi.

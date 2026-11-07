@@ -5,7 +5,6 @@ import "errors"
 // Domain errors
 var (
 	ErrUserNotFound       = errors.New("user not found")
-	ErrProductNotFound    = errors.New("product not found")
 	ErrInvalidCredentials = errors.New("invalid credentials")
 	ErrUserAlreadyExists  = errors.New("user already exists")
 	ErrInvalidInput       = errors.New("invalid input")

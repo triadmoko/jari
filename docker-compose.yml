@@ -30,7 +30,7 @@ services:
     networks:
       - jari-network
 
-  # Redis (for caching, optional)
+  # Redis: background job queue (asynq), see docs/adr/0004-job-latar-dan-queue.md
   redis:
     image: redis:7-alpine
     container_name: jari-redis

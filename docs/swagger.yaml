@@ -103,12 +103,13 @@ info:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: A REST API built with Go and Clean Architecture
+  description: REST API for Jari, an open-source work and project management platform
+    (Jira clone). "Jari" is the working name until the final product name is decided.
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
   termsOfService: http://swagger.io/terms/
-  title: Backend API
+  title: Jari API
   version: "1.0"
 paths:
   /api/v1/auth/login:

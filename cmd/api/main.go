@@ -11,9 +11,9 @@ import (
 	"syscall"
 )
 
-//	@title			Backend API
+//	@title			Jari API
 //	@version		1.0
-//	@description	A REST API built with Go and Clean Architecture
+//	@description	REST API for Jari, an open-source work and project management platform (Jira clone). "Jari" is the working name until the final product name is decided.
 //	@termsOfService	http://swagger.io/terms/
 
 //	@contact.name	API Support
