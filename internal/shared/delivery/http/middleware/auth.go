@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"app/internal/core/config"
 	"app/internal/shared/constants"
 	"app/internal/shared/delivery/http/response"
 	"app/pkg/jwt"
@@ -15,8 +14,8 @@ const (
 	SESS = "sess"
 )
 
-// AuthMiddleware creates an authentication middleware using JWT secret
-func AuthMiddleware() gin.HandlerFunc {
+// AuthMiddleware creates an authentication middleware that validates tokens signed with jwtSecret
+func AuthMiddleware(jwtSecret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lang := GetLangFromGin(c)
 
@@ -43,7 +42,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		// Validate the token
-		claims, err := jwt.ValidateToken(config.Load().JWT.Secret, token)
+		claims, err := jwt.ValidateToken(jwtSecret, token)
 		if err != nil {
 			response.NewResponse(c, http.StatusUnauthorized, nil, constants.GetErrorMessage(constants.Unauthorized, lang), nil)
 			c.Abort()

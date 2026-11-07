@@ -22,15 +22,17 @@ type AuthUsecase interface {
 
 // authUsecase implements AuthUsecase interface
 type authUsecase struct {
-	userRepo repository.UserRepository
-	logger   *logrus.Logger
+	userRepo  repository.UserRepository
+	logger    *logrus.Logger
+	jwtSecret string
 }
 
 // NewAuthUsecase creates a new auth usecase
-func NewAuthUsecase(userRepo repository.UserRepository, logger *logrus.Logger) AuthUsecase {
+func NewAuthUsecase(userRepo repository.UserRepository, logger *logrus.Logger, jwtSecret string) AuthUsecase {
 	return &authUsecase{
-		userRepo: userRepo,
-		logger:   logger,
+		userRepo:  userRepo,
+		logger:    logger,
+		jwtSecret: jwtSecret,
 	}
 }
 
@@ -90,7 +92,7 @@ func (a *authUsecase) Login(ctx context.Context, req dto_auth.LoginRequest) (*dt
 	}
 
 	// Generate token with string UUID
-	token, err := jwt.GenerateToken(jwt.UserPayload{
+	token, err := jwt.GenerateToken(a.jwtSecret, jwt.UserPayload{
 		ID:       user.ID,
 		Email:    user.Email,
 		Username: user.Username,

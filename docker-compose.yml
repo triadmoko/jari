@@ -5,7 +5,7 @@ x-db-env: &db-env
   DB_HOST: postgres
   DB_PORT: "5432"
   DB_USER: postgres
-  DB_PASS: password
+  DB_PASS: ${DB_PASS:-password}
   DB_NAME: jari
   DB_SSLMODE: disable
 
@@ -17,7 +17,7 @@ services:
     environment:
       POSTGRES_DB: jari
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: ${DB_PASS:-password}
     ports:
       - "5432:5432"
     volumes:
@@ -66,7 +66,7 @@ services:
       <<: *db-env
       SERVER_PORT: "8080"
       SERVER_HOST: 0.0.0.0
-      JWT_SECRET: your-super-secret-jwt-key-change-this-in-production
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in .env (openssl rand -hex 32)}
       ENV: production
     depends_on:
       postgres:

@@ -1,7 +1,6 @@
 package jwt
 
 import (
-	"os"
 	"testing"
 	"time"
 
@@ -9,12 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMain(m *testing.M) {
-	// Set JWT_SECRET for testing
-	os.Setenv("JWT_SECRET", "test-secret-key")
-	code := m.Run()
-	os.Exit(code)
-}
+const secret = "test-secret-key"
 
 func TestGenerateToken_Success(t *testing.T) {
 	user := UserPayload{
@@ -23,7 +17,7 @@ func TestGenerateToken_Success(t *testing.T) {
 		Username: "testuser",
 	}
 
-	token, err := GenerateToken(user)
+	token, err := GenerateToken(secret, user)
 
 	require.NoError(t, err)
 	assert.NotEmpty(t, token)
@@ -37,7 +31,7 @@ func TestGenerateTokenWithExpiry_Success(t *testing.T) {
 	}
 	expiry := 1 * time.Hour
 
-	token, err := GenerateTokenWithExpiry(user, expiry)
+	token, err := GenerateTokenWithExpiry(secret, user, expiry)
 
 	require.NoError(t, err)
 	assert.NotEmpty(t, token)
@@ -51,7 +45,7 @@ func TestValidateToken_Success(t *testing.T) {
 		Username: "testuser",
 	}
 
-	token, err := GenerateToken(user)
+	token, err := GenerateToken(secret, user)
 	require.NoError(t, err)
 
 	claims, err := ValidateToken(secret, token)
@@ -80,7 +74,7 @@ func TestValidateToken_WrongSecret(t *testing.T) {
 		Username: "testuser",
 	}
 
-	token, err := GenerateToken(user)
+	token, err := GenerateToken(secret, user)
 	require.NoError(t, err)
 
 	claims, err := ValidateToken(wrongSecret, token)
@@ -98,7 +92,7 @@ func TestValidateToken_ExpiredToken(t *testing.T) {
 	}
 
 	// Generate token with very short expiry
-	token, err := GenerateTokenWithExpiry(user, -1*time.Hour) // Already expired
+	token, err := GenerateTokenWithExpiry(secret, user, -1*time.Hour) // Already expired
 	require.NoError(t, err)
 
 	claims, err := ValidateToken(secret, token)

@@ -1,6 +1,9 @@
 package app
 
 import (
+	"fmt"
+
+	"app/internal/core/config"
 	"app/internal/features/auth"
 	"app/internal/features/user"
 	"app/internal/shared/delivery/http/apidocs"
@@ -27,6 +30,7 @@ type Feature interface {
 
 // App holds the application and its dependencies
 type App struct {
+	Config *config.Config
 	DB     *database.PostgresDB
 	Engine *gin.Engine
 	Logger *logrus.Logger
@@ -36,10 +40,18 @@ type App struct {
 func New() (*App, error) {
 	app := &App{}
 
+	// Load and validate configuration once; it is injected into every component.
+	// Fails fast on unsafe values (e.g. a missing JWT_SECRET outside development).
+	cfg, err := config.Load()
+	if err != nil {
+		return nil, fmt.Errorf("invalid configuration: %w", err)
+	}
+	app.Config = cfg
+
 	app.Logger = logger.NewLogger()
 
 	// Initialize database
-	db, err := database.NewPostgresDB()
+	db, err := database.NewPostgresDB(cfg.Database)
 	if err != nil {
 		return nil, err
 	}
@@ -89,8 +101,8 @@ func (a *App) setupRouter() *gin.Engine {
 
 	// Register all features - just add one line per new feature!
 	features := []Feature{
-		auth.NewModule(userRepo, a.Logger),
-		user.NewModule(userRepo, a.Logger),
+		auth.NewModule(userRepo, a.Logger, a.Config.JWT.Secret),
+		user.NewModule(userRepo, a.Logger, a.Config.JWT.Secret),
 	}
 
 	for _, f := range features {

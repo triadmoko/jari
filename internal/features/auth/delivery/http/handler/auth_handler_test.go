@@ -41,10 +41,10 @@ func TestRegister_Success(t *testing.T) {
 	router.POST("/register", setLanguageMiddleware, handler.Register)
 
 	reqBody := dto_auth.RegisterRequest{
-		Email:     "test@example.com",
-		Username:  "testuser",
-		Password:  "password123",
-		Name: "Test User",
+		Email:    "test@example.com",
+		Username: "testuser",
+		Password: "password123",
+		Name:     "Test User",
 	}
 
 	expectedUser := &dto_auth.RegisterResponse{
@@ -123,10 +123,10 @@ func TestRegister_UsecaseError(t *testing.T) {
 	router.POST("/register", setLanguageMiddleware, handler.Register)
 
 	reqBody := dto_auth.RegisterRequest{
-		Email:     "test@example.com",
-		Username:  "testuser",
-		Password:  "password123",
-		Name: "Test User",
+		Email:    "test@example.com",
+		Username: "testuser",
+		Password: "password123",
+		Name:     "Test User",
 	}
 
 	mockUsecase.EXPECT().

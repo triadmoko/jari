@@ -19,21 +19,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMain(m *testing.M) {
-	// Set JWT_SECRET for testing
-	os.Setenv("JWT_SECRET", "test-secret-key")
-	code := m.Run()
-	os.Exit(code)
-}
-
 func setupTest(t *testing.T) (*authUsecase, *mocks.MockUserRepository) {
 	mockRepo := mocks.NewMockUserRepository(t)
 	logger := logrus.New()
 	logger.SetOutput(os.Stderr)
 
 	uc := &authUsecase{
-		userRepo: mockRepo,
-		logger:   logger,
+		userRepo:  mockRepo,
+		logger:    logger,
+		jwtSecret: "test-secret-key",
 	}
 
 	return uc, mockRepo
@@ -48,10 +42,10 @@ func TestRegister_Success(t *testing.T) {
 	ctx := createTestContext()
 
 	req := dto_auth.RegisterRequest{
-		Email:     "test@example.com",
-		Username:  "testuser",
-		Password:  "password123",
-		Name: "Test User",
+		Email:    "test@example.com",
+		Username: "testuser",
+		Password: "password123",
+		Name:     "Test User",
 	}
 
 	// Mock: email not found
@@ -76,10 +70,10 @@ func TestRegister_UserAlreadyExists(t *testing.T) {
 	ctx := createTestContext()
 
 	req := dto_auth.RegisterRequest{
-		Email:     "existing@example.com",
-		Username:  "testuser",
-		Password:  "password123",
-		Name: "Test User",
+		Email:    "existing@example.com",
+		Username: "testuser",
+		Password: "password123",
+		Name:     "Test User",
 	}
 
 	existingUser := &entity.User{
@@ -102,10 +96,10 @@ func TestRegister_UsernameAlreadyTaken(t *testing.T) {
 	ctx := createTestContext()
 
 	req := dto_auth.RegisterRequest{
-		Email:     "test@example.com",
-		Username:  "existinguser",
-		Password:  "password123",
-		Name: "Test User",
+		Email:    "test@example.com",
+		Username: "existinguser",
+		Password: "password123",
+		Name:     "Test User",
 	}
 
 	existingUser := &entity.User{
@@ -130,10 +124,10 @@ func TestRegister_CreateUserError(t *testing.T) {
 	ctx := createTestContext()
 
 	req := dto_auth.RegisterRequest{
-		Email:     "test@example.com",
-		Username:  "testuser",
-		Password:  "password123",
-		Name: "Test User",
+		Email:    "test@example.com",
+		Username: "testuser",
+		Password: "password123",
+		Name:     "Test User",
 	}
 
 	// Mock: email not found

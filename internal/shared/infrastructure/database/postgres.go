@@ -16,9 +16,7 @@ type PostgresDB struct {
 }
 
 // NewPostgresDB creates a new PostgreSQL database connection using GORM
-func NewPostgresDB() (*PostgresDB, error) {
-	cfg := config.Load().Database
-
+func NewPostgresDB(cfg config.DatabaseConfig) (*PostgresDB, error) {
 	dsn := cfg.URL
 	if dsn == "" {
 		dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"app/internal/core/config"
 	"app/internal/shared/infrastructure/database"
 	"app/internal/shared/infrastructure/database/migrator"
 	"app/migrations"
@@ -16,7 +17,7 @@ func runMigrate(args []string) error {
 		return err
 	}
 
-	db, err := database.NewPostgresDB()
+	db, err := database.NewPostgresDB(config.Parse().Database)
 	if err != nil {
 		return err
 	}
