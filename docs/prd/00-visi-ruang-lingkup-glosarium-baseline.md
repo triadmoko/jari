@@ -321,14 +321,14 @@ Pekerjaan berikut diselesaikan sebelum fitur Fase 1 dimulai, karena menjadi pras
 - **S0-04 Konfigurasi aman** — tolak start (fail-fast) bila `JWT_SECRET` kosong/default di luar mode development; selaraskan `DB_PASS`/`DB_PASSWORD`; baca `ENV`; muat konfigurasi sekali dan injeksikan; hapus sisa `yopatungan` dari compose, nama container, dan database.
 - **S0-05 CORS & metode HTTP** — allowlist origin dari konfigurasi (bukan `*` bersama credentials); izinkan `PATCH`.
 - **S0-06 Otorisasi minimum** — batasi `GET /api/v1/users` untuk admin; tambahkan middleware peran berbasis klaim terverifikasi dari database sebagai jembatan sampai modul [03](03-izin-peran-keamanan.md) selesai.
-- **S0-07 Bersihkan warisan template** — hapus `ErrProductNotFound`, putuskan nasib redis (dipakai untuk cache/queue atau dihapus dari compose), ganti README template, ganti judul swagger "Backend API" dengan nama kerja produk.
+- **S0-07 Bersihkan warisan template** — hapus `ErrProductNotFound`, nasib redis sudah diputuskan: dipakai untuk queue dan tetap di compose ([ADR-0004](../adr/0004-job-latar-dan-queue.md)), ganti README template, ganti judul swagger "Backend API" dengan nama kerja produk.
 - **S0-08 Regenerasi kontrak API** — jalankan `make swag` dan regenerasi `frontend/src/lib/api/api.ts`; ganti `first_name/last_name` menjadi `name` di `SessionUser`; verifikasi interceptor Bearer dan penanganan 401 di `client.ts`.
 - **S0-09 Pulihkan kerangka frontend** — putuskan apakah `(guest)` dan `+error.svelte` yang terhapus dipulihkan atau diganti; buat halaman login, register, home, profil minimal; isi atau hapus stub `lib/features/admin`.
 - **S0-10 Operasional dasar** — `/health` memeriksa koneksi DB (liveness vs readiness), request-id per permintaan, healthcheck Docker, level GORM logger mengikuti env, log JSON di produksi.
 - **S0-11 CI** — pipeline lint + unit test Go + test frontend + build image untuk setiap PR.
 - **S0-12 Identitas produk** — terapkan nama kerja produk dan aset brand sendiri di UI, email, user agent, swagger (VISI-001); tambahkan laporan lisensi dependensi.
 - **S0-13 Fondasi i18n & terminologi** — siapkan katalog label UI terpusat ID/EN dengan istilah "work item"/"space" (VISI-002), memperluas pola konstanta galat id/en yang sudah ada.
-- **S0-14 Keputusan teknis Fase 1** — pilih library drag-and-drop untuk board, strategi penyimpanan berkas lampiran, transport SMTP, dan mekanisme job latar; dicatat sebagai ADR (rinciannya di modul [27](27-nfr-arsitektur-platform.md)).
+- **S0-14 Keputusan teknis Fase 1** — pilih library drag-and-drop untuk board, strategi penyimpanan berkas lampiran, transport SMTP, dan mekanisme job latar; dicatat sebagai ADR (rinciannya di modul [27](27-nfr-arsitektur-platform.md)). Hasil: [ADR-0001 sampai ADR-0004](../adr/README.md) berstatus Accepted — drag-and-drop dibangun sendiri (`lib/dnd`), lampiran di S3-kompatibel, email keluar lewat SMTP, dan queue di Redis (`asynq`).
 
 ## Peta fase delivery
 

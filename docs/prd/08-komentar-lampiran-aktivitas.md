@@ -364,7 +364,7 @@ Strategi urutan implementasi: Fase 1 membangun tiga fondasi yang dipakai hampir 
   7. Company-managed field configuration (CFG-043) dapat menyembunyikan field Attachment sehingga panel dan kontrol upload tidak tampil di project terkait.
   8. Pengaturan thumbnail dan ZIP preview gaya Server/DC tidak disediakan sebagai opsi admin; thumbnail selalu aktif.
 - **Team-managed vs company-managed:** Company-managed memakai field configuration untuk menyembunyikan field; team-managed memakai layout work type.
-- **Catatan & ketergantungan:** Bergantung pada modul 22 (halaman admin) dan CMT-019 (penegakan kuota). Nilai default disimpan di tabel pengaturan global.
+- **Catatan & ketergantungan:** Penyimpanan file memakai S3-kompatibel saja ([ADR-0002](../adr/0002-penyimpanan-lampiran.md)). Bergantung pada modul 22 (halaman admin) dan CMT-019 (penegakan kuota). Nilai default disimpan di tabel pengaturan global.
 
 ### CMT-017 Attachment Security and Malware Scanning
 

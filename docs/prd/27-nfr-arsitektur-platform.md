@@ -124,14 +124,14 @@ Strategi urutan implementasi: NFR bukan fitur yang dirilis sekali, melainkan pag
 - **Aktor & izin:** Engineering. Tidak ada permission pengguna; cache wajib menghormati hasil otorisasi PERM-002.
 - **Aturan perilaku (acceptance criteria):**
   1. Konfigurasi statis (issue type, status, priority, resolution, scheme) di-cache in-process (LRU dengan batas ukuran); setiap perubahan konfigurasi menerbitkan pesan invalidasi lewat pub/sub (NFR-009 butir 4) sehingga semua replika membuang entri usang dalam ≤ 5 detik.
-  2. Cache Redis bersifat opsional untuk hasil izin terkomputasi dan counter rate limit; tanpa Redis, aplikasi tetap berfungsi benar dengan cache in-process dan counter berbasis PostgreSQL.
+  2. Redis tersedia sejak Fase 1 sebagai dependensi wajib untuk queue (NFR-008, [ADR-0004](../adr/0004-job-latar-dan-queue.md)) dan dapat dipakai untuk cache hasil izin terkomputasi serta counter rate limit. Cache tetap hanya optimasi: hasil harus benar walau entri cache kosong atau hilang, dengan fallback ke cache in-process dan counter berbasis PostgreSQL.
   3. Setiap project memiliki generation number yang dinaikkan saat scheme (permission, workflow, field configuration, issue security) yang terkait berubah; kunci cache menyertakan generation number sehingga seluruh entri project tersebut tidak valid secara massal tanpa scan.
   4. Respons work item dan konfigurasi mendukung ETag/If-None-Match (304 Not Modified); aset SPA ber-hash nama dikirim dengan `Cache-Control: public, max-age=31536000, immutable`, sedangkan `index.html` dikirim dengan `Cache-Control: no-cache`.
   5. Respons yang berisi data work item atau data pengguna dikirim dengan `Cache-Control: private` (atau `no-store` untuk data sensitif) dan tidak boleh di-cache oleh shared cache/CDN.
   6. Saat start, konfigurasi global (status category, issue type, priority, site settings) dimuat ke cache (cache warming) sebelum readiness (NFR-010 butir 2) dilaporkan siap.
   7. Setiap cache mengekspos metrik hit, miss, eviction, dan ukuran per nama cache (NFR-012 butir 3).
 - **Team-managed vs company-managed:** Konfigurasi team-managed bersifat per project sehingga cache-nya dikunci per project; company-managed dikunci per scheme bersama dan diinvalidasi lewat generation number semua project yang memakai scheme tersebut.
-- **Catatan & ketergantungan:** Compose repo sudah menyertakan Redis 7 tetapi aplikasi belum memakainya; Redis tetap opsional. Bergantung pada PERM-002, NFR-009, NFR-012, VISI-003 (feature flag yang juga di-cache).
+- **Catatan & ketergantungan:** Compose repo sudah menyertakan Redis 7 dan kini menjadi dependensi wajib untuk queue ([ADR-0004](../adr/0004-job-latar-dan-queue.md)); pemakaian untuk cache bersifat opsional. Bergantung pada PERM-002, NFR-009, NFR-012, VISI-003 (feature flag yang juga di-cache).
 
 ### NFR-004 Limits & Guardrails
 
@@ -216,18 +216,18 @@ Strategi urutan implementasi: NFR bukan fitur yang dirilis sekali, melainkan pag
 - **Prioritas / Fase / Tier:** P0 / Fase 1 / platform
 - **Aktor & izin:** Engineering dan SRE; Admin Situs (Administer Jira) melihat dan mengulang job gagal; pengguna pemicu operasi bulk melihat progres job miliknya.
 - **Aturan perilaku (acceptance criteria):**
-  1. Queue default berbasis PostgreSQL dengan `SELECT ... FOR UPDATE SKIP LOCKED` (mis. library River); adapter Redis bersifat opsional dan antarmukanya identik sehingga pilihan backend tidak mengubah perilaku.
-  2. Setiap perubahan domain menulis baris outbox dalam transaksi yang sama (NFR-006 butir 3); dispatcher membaca outbox dan meneruskan ke handler notifikasi, webhook, otomasi, indexer, dan real-time, serta menandai baris terkirim.
+  1. Queue berbasis Redis (library `asynq`) dan Redis adalah dependensi wajib sejak Fase 1 ([ADR-0004](../adr/0004-job-latar-dan-queue.md)); aplikasi gagal start bila Redis tidak dikonfigurasi atau tidak terjangkau. Persistensi Redis (AOF) diaktifkan di compose referensi dan dianjurkan Sentinel atau Cluster di produksi.
+  2. Setiap perubahan domain menulis baris outbox di PostgreSQL dalam transaksi yang sama (NFR-006 butir 3); relay/dispatcher membaca outbox, meng-enqueue ke Redis, lalu menandai baris terkirim. Pengiriman bersifat at-least-once sehingga handler notifikasi, webhook, otomasi, indexer, dan real-time wajib idempoten.
   3. Jenis job yang didukung minimal: bulk change/move/transition/delete, reindex, import CSV, export besar, migrasi scheme, pengiriman email, polling inbound mail, filter subscription, scheduled trigger otomasi, webhook delivery, scan/thumbnail attachment, rebalance LexoRank, purge trash, penghapusan GDPR, dan backup.
   4. Job gagal di-retry dengan exponential backoff hingga batas attempt per jenis job; setelah batas habis job masuk dead-letter queue dan dapat dilihat, diulang, atau dibuang. Pemilik kemampuan ini adalah NFR-008 sendiri: sejak Fase 1 tersedia endpoint admin terlindungi `/api/v1/admin/jobs` (daftar job per status/jenis, detail galat terakhir, retry, discard) dan halaman admin "Background jobs" sederhana di area Administrasi Sistem (modul 22), keduanya hanya untuk Admin Situs (Administer Jira); retry dan discard tercatat lewat `AuditRecorder.Record` (NFR-017).
   5. Setiap job memiliki idempotency key; enqueue dengan key yang sama selama job sebelumnya belum selesai tidak membuat job ganda.
   6. Antrean dipisah per kelas prioritas (interaktif, misalnya email dan real-time, vs batch, misalnya bulk change dan reindex) dengan kuota worker terpisah sehingga operasi bulk tidak menunda notifikasi.
   7. Job jangka panjang melaporkan progres (persentase, pesan status, hasil per item termasuk item gagal beserta alasan) yang dapat dipantau dari UI, setara halaman progres bulk change vendor pembanding; data progres yang sama kelak diekspos oleh Async Tasks API (API-007, Fase 3).
-  8. Scheduler cron terdistribusi memakai advisory lock sehingga job terjadwal hanya berjalan satu kali per jadwal meski ada banyak replika.
+  8. Scheduler cron terdistribusi menjamin job terjadwal hanya berjalan satu kali per jadwal meski ada banyak replika (mekanisme, misalnya peran scheduler tunggal atau lock terdistribusi, ditetapkan pada tiket implementasi).
   9. Worker berjalan di binary yang sama dalam mode all-in-one (default) atau sebagai proses terpisah dengan flag `--role=worker` (NFR-013 butir 1).
   10. Saat shutdown worker berhenti mengambil job baru, menyelesaikan job aktif hingga batas waktu, lalu mengembalikan job yang belum selesai ke antrean; job yang tertinggal karena crash diambil ulang setelah visibility timeout habis.
 - **Team-managed vs company-managed:** Tidak ada perbedaan.
-- **Catatan & ketergantungan:** Compose repo sudah menyertakan Redis tetapi queue default tidak bergantung padanya. Bergantung pada NFR-006, NFR-010 butir 1, NFR-017 (jalur tulis audit), dan modul 28 (katalog event). Dipakai oleh NTF-008, modul 20 (otomasi), modul 23 (webhook), dan API-007 Async Tasks API (Fase 3) yang membaca status job dari tabel yang sama. UI job/DLQ dimiliki fitur ini (butir 4), bukan ADM-057 System info & troubleshooting tools yang berstatus Fase — (Data Center); halaman admin Background jobs Fase 1 dapat diperkaya di Fase 3 (filter lanjut, grafik throughput) tanpa memindahkan kepemilikan.
+- **Catatan & ketergantungan:** Keputusan teknis: [ADR-0004](../adr/0004-job-latar-dan-queue.md) (Redis/`asynq`, outbox tetap di PostgreSQL); Redis sudah ada di compose repo. Bergantung pada NFR-006, NFR-010 butir 1, NFR-017 (jalur tulis audit), dan modul 28 (katalog event). Dipakai oleh NTF-008, modul 20 (otomasi), modul 23 (webhook), dan API-007 Async Tasks API (Fase 3) yang membaca status job dari tabel yang sama. UI job/DLQ dimiliki fitur ini (butir 4), bukan ADM-057 System info & troubleshooting tools yang berstatus Fase — (Data Center); halaman admin Background jobs Fase 1 dapat diperkaya di Fase 3 (filter lanjut, grafik throughput) tanpa memindahkan kepemilikan.
 
 ### NFR-009 Real-time Updates (SSE / WebSocket)
 
@@ -456,7 +456,7 @@ Strategi urutan implementasi: NFR bukan fitur yang dirilis sekali, melainkan pag
   7. Setiap route memiliki error boundary yang menampilkan pesan dan opsi coba lagi tanpa merusak shell aplikasi, dan indikator offline tampil saat koneksi jaringan terputus.
   8. Design token (warna, spasi, tipografi) dipakai konsisten di seluruh komponen dan mendukung tema light, dark, dan mengikuti sistem (NAV-034).
 - **Team-managed vs company-managed:** Tidak ada perbedaan.
-- **Catatan & ketergantungan:** Lihat `frontend/CLAUDE.md`; mekanisme embed dan `NoRoute` sudah ada di repo (`webui.RegisterRoutes`), dan tanpa build frontend server menjawab 404 "frontend is not built". Bergantung pada NFR-001, NFR-003 butir 4, NFR-015 butir 3, AUTH-007, NAV-034.
+- **Catatan & ketergantungan:** Drag-and-drop dibangun sendiri sebagai modul reusable `frontend/src/lib/dnd/` ([ADR-0001](../adr/0001-library-drag-and-drop-board.md)). Lihat `frontend/CLAUDE.md`; mekanisme embed dan `NoRoute` sudah ada di repo (`webui.RegisterRoutes`), dan tanpa build frontend server menjawab 404 "frontend is not built". Bergantung pada NFR-001, NFR-003 butir 4, NFR-015 butir 3, AUTH-007, NAV-034.
 
 ### NFR-021 Internationalization (i18n ID/EN)
 
@@ -532,10 +532,21 @@ Strategi urutan implementasi: NFR bukan fitur yang dirilis sekali, melainkan pag
 - **Team-managed vs company-managed:** Test matriks izin wajib mencakup kedua tipe project.
 - **Catatan & ketergantungan:** Pola test repo saat ini: mockery dan go-sqlmock (`internal/shared/infrastructure/repository/user_repository_impl_test.go`). Bergantung pada NFR-001, NFR-005, NFR-015, NFR-022, modul 12 (JQL), modul 23 (OpenAPI).
 
+## Keputusan arsitektur (ADR)
+
+Keputusan teknis Fase 1 dicatat sebagai ADR di [`docs/adr/`](../adr/README.md) (S0-14, KAN-11):
+
+| ADR | Keputusan | Fitur terkait |
+| --- | --- | --- |
+| [ADR-0001](../adr/0001-library-drag-and-drop-board.md) | Drag-and-drop dibangun sendiri sebagai modul frontend reusable (`lib/dnd`), tanpa library eksternal. | NFR-020, NFR-022, BRD-016, BRD-017 |
+| [ADR-0002](../adr/0002-penyimpanan-lampiran.md) | Penyimpanan lampiran S3-kompatibel saja (MinIO untuk dev/self-hosted); metadata di PostgreSQL. | CMT-016, CMT-017 |
+| [ADR-0003](../adr/0003-transport-email-keluar.md) | Email keluar lewat SMTP di balik interface `Mailer`, dikirim lewat queue. | NTF-023 |
+| [ADR-0004](../adr/0004-job-latar-dan-queue.md) | Queue berbasis Redis (`asynq`), Redis wajib; outbox tetap di PostgreSQL dengan relay. | NFR-003, NFR-008, NFR-009 |
+
 ## Pertanyaan terbuka
 
 - Apakah konflik edit bersamaan pada field yang sama memakai optimistic locking dengan HTTP 409 (usulan clone) atau last-write-wins per field seperti vendor pembanding demi kompatibilitas API (NFR-006 butir 1)?
-- Apakah queue default memakai library River (PostgreSQL) dan Redis cukup opsional, atau Redis dijadikan dependensi wajib sejak Fase 2 untuk pub/sub real-time dan cache (NFR-003, NFR-008, NFR-009)?
+- ~~Apakah queue default memakai library River (PostgreSQL) dan Redis cukup opsional, atau Redis dijadikan dependensi wajib sejak Fase 2?~~ **Terjawab:** Redis wajib sejak Fase 1 dengan `asynq`; River tidak dipakai ([ADR-0004](../adr/0004-job-latar-dan-queue.md)).
 - Apakah search engine eksternal (OpenSearch) disertakan sebagai komponen resmi atau PostgreSQL FTS menjadi satu-satunya backend sampai Fase 3 (NFR-010 butir 9, SRC-001)?
 - Berapa angka default guardrail yang dipakai untuk batas board, jumlah attachment/comment/worklog/link/sub-task per work item, dan `maxResults` endpoint ID-only (NFR-004 butir 2, 4, 5)?
 - Apakah mode SaaS multi-tenant akan benar-benar dibangun, atau produk ini tetap single-tenant per deployment secara permanen (NFR-014)?

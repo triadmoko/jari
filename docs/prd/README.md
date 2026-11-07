@@ -361,6 +361,8 @@ Pertanyaan outline "apakah Service Management dan Product Discovery di luar caku
 3. **Format rich text**: dokumen JSON ala ADF (ProseMirror/TipTap) atau Markdown. Juga apakah impor/ekspor ADF dan wiki markup diperlukan, termasuk alias `/rest/api/2`. (O; M23)
 4. **Search engine**: Postgres FTS saja atau OpenSearch/Meilisearch, dan pada ambang berapa mode eksternal wajib. Juga apakah stemming Bahasa Indonesia menjadi syarat rilis Fase 1, dan apakah konfigurasinya per situs atau per dokumen. (O; M12 JQL-012; M13 SRC-001; M27 NFR-010)
 5. **Queue, cache & pub/sub**: River (PostgreSQL) dengan Redis opsional, atau Redis wajib sejak Fase 2. Juga apakah Redis di docker-compose tetap dipakai, dan apakah outbox cukup dengan Postgres (polling/LISTEN-NOTIFY) atau perlu broker sejak Fase 3. (O; M27 NFR-003, NFR-008, NFR-009; M28)
+
+   **Terjawab sebagian ([ADR-0004](../adr/0004-job-latar-dan-queue.md)):** queue memakai Redis (`asynq`) dan Redis wajib sejak Fase 1, bukan River; Redis tetap ada di docker-compose; outbox tetap tabel PostgreSQL yang diteruskan ke Redis oleh relay (at-least-once). Yang masih terbuka: apakah broker terpisah dibutuhkan sejak Fase 3.
 6. **Konkurensi edit**: optimistic locking dengan HTTP 409 atau last-write-wins per field, untuk field umum dan Description. Juga apakah co-editing realtime dibutuhkan. (O; M07 EDT-026; M27 NFR-006)
 7. **Riwayat & graf**: apakah riwayat versi workflow dengan rollback dibangun di Fase 2, dan apakah graf entitas (DM-015) dibangun di Fase 4 tanpa konsumen AI yang pasti. (M28)
 8. **Logger**: migrasi dari logrus ke `log/slog`, atau logrus dipertahankan dengan formatter JSON. (M27 NFR-012)
@@ -370,6 +372,8 @@ Pertanyaan outline "apakah Service Management dan Product Discovery di luar caku
    - apakah konversi dokumen Office dan transcoder video menjadi komponen bawaan atau dependency opsional.
 
    (O; M08 CMT-015, CMT-016, CMT-019)
+
+   **Terjawab ([ADR-0002](../adr/0002-penyimpanan-lampiran.md)):** penyimpanan S3-kompatibel saja (tanpa disk lokal; MinIO untuk dev dan self-hosted); 100 MB per file (konfigurasi hingga 2 GB), 2.000 attachment per work item, tanpa kuota default; konversi Office dan transcoder video bukan komponen bawaan, melainkan dependency opsional di luar Fase 1.
 10. **Email keluar & masuk**:
     - penyedia email keluar (SMTP sendiri, SES, Mailgun);
     - email masuk lewat domain inbound bawaan, penerima SMTP/MX di dalam binary, atau hanya IMAP/POP dan forwarding;
@@ -377,6 +381,8 @@ Pertanyaan outline "apakah Service Management dan Product Discovery di luar caku
     - apakah balasan email notifikasi menjadi comment di project non-service, dan pada fase berapa.
 
     (O; M08 CMT-001; M19 NTF-023, NTF-034; M26 BIZ-047; M29 JSM-PRJ-063; M30 JSM-PRT-040)
+
+    **Terjawab sebagian ([ADR-0003](../adr/0003-transport-email-keluar.md)):** penyedia email keluar adalah SMTP generik di balik interface `Mailer` (SES dan Mailgun dapat dipakai lewat relay SMTP), dikirim lewat queue. Tiga butir lain (email masuk, domain bawaan service project, balasan email menjadi comment) tetap terbuka.
 11. **Custom domain & TLS**: dikelola produk (ACME) atau diserahkan ke reverse proxy. (M30 JSM-PRT-009)
 12. **Akun customer**: disimpan di tabel `users` dengan kolom tipe akun atau di tabel terpisah. Juga apakah satu email boleh memiliki akun portal-only sekaligus akun situs, dan bagaimana deduplikasi notifikasi bagi pengguna berlisensi yang juga reporter/participant. (M29 JSM-PRJ-045, JSM-PRJ-048, JSM-PRJ-068; M30 JSM-PRT-014, JSM-PRT-036)
 13. **Infrastruktur realtime live chat CSM**: kanal realtime umum (modul 27) atau infrastruktur sendiri. (M35)
@@ -779,7 +785,7 @@ Ringkasan risiko dari outline riset, ditambah tiga risiko yang muncul saat menyu
 | 6 | **Infrastruktur pendukung belum ada** (job queue, email, storage, realtime, rate limit, audit). MVP butuh pekerjaan platform yang tidak terlihat pengguna. | Rencanakan kapasitas platform eksplisit di Fase 1-2. | 27, 28 |
 | 7 | **Keamanan konten**: rich text, lampiran, smart link, dan web request otomasi/webhook membuka celah XSS, malware, dan SSRF. | Sanitasi server-side, pemindaian lampiran, dan proteksi SSRF dengan allowlist. | 07, 08, 20, 23 |
 | 8 | **Merek dagang & hukum**: meniru nama, logo, atau istilah eksklusif Atlassian secara berlebihan. | VISI-001: satu sumber nama produk, pemindaian CI, dan disclaimer nominatif. | 00 |
-| 9 | **Frontend**: belum ada library drag-and-drop yang aksesibel; editor kaya dan virtualisasi daftar besar menambah ukuran bundle. | Evaluasi library di Sprint 0, code-splitting, dan target WCAG 2.1 AA. | 07, 10, 21 |
+| 9 | **Frontend**: belum ada library drag-and-drop yang aksesibel; editor kaya dan virtualisasi daftar besar menambah ukuran bundle. | Diputuskan: drag-and-drop dibangun sendiri sebagai modul reusable `lib/dnd` dengan target WCAG 2.1 AA ([ADR-0001](../adr/0001-library-drag-and-drop-board.md)); code-splitting dan virtualisasi tetap berlaku. | 07, 10, 21 |
 | 10 | **Laporan historis** (burndown, CFD, control chart, sprint report) bergantung pada changelog lengkap sejak awal. Data historis yang tidak tercatat di MVP tidak dapat dipulihkan. | Changelog dan event domain wajib sejak Fase 1. | 08, 16, 28 |
 | 11 | **Single binary** membatasi skala horizontal SSE dan job worker bila state tidak dipisahkan. | Pub/sub terpisah dan mode worker terpisah. | 27 |
 | 12 | **Keputusan produk terlambat** (tenancy, format konten, gaya proyek, search engine) memaksa migrasi data besar di fase berikutnya. | Selesaikan butir B.1, D.1-D.5, dan G.1 di [Pertanyaan terbuka](#pertanyaan-terbuka-gabungan) sebelum Fase 1. | 00, 04, 27, 28 |

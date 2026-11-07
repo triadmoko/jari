@@ -496,7 +496,7 @@ Strategi urutan implementasi: Fase 1 membangun fondasi yang dipakai semua kanal,
   15. Outgoing mail dapat dinonaktifkan lewat flag startup (env `MAIL_OUTGOING_DISABLED=true`) atau dari admin UI; saat nonaktif email tetap ditulis ke outbox berstatus "skipped" tanpa dikirim.
   16. Konfigurasi dapat diberikan lewat environment (`SMTP_*`, diutamakan dan mengunci field UI) atau lewat admin UI; perubahan konfigurasi berlaku tanpa restart dan pengiriman memakai retry dari NTF-008.
 - **Team-managed vs company-managed:** Tidak ada perbedaan.
-- **Catatan & ketergantungan:** Konfigurasi dimuat oleh `internal/core/config/` sesuai pola repo; secret disimpan memakai mekanisme enkripsi [27](27-nfr-arsitektur-platform.md). Inbound email lengkap untuk Service Management (email channel) dibangun di modul 30 di atas komponen ini. Butir inbound (7) aktif bersama NTF-031 di Fase 3; butir outbound wajib di Fase 1.
+- **Catatan & ketergantungan:** Transport keluar adalah SMTP di balik interface `Mailer` ([ADR-0003](../adr/0003-transport-email-keluar.md)), dikirim lewat queue ([ADR-0004](../adr/0004-job-latar-dan-queue.md)). Konfigurasi dimuat oleh `internal/core/config/` sesuai pola repo; secret disimpan memakai mekanisme enkripsi [27](27-nfr-arsitektur-platform.md). Inbound email lengkap untuk Service Management (email channel) dibangun di modul 30 di atas komponen ini. Butir inbound (7) aktif bersama NTF-031 di Fase 3; butir outbound wajib di Fase 1.
 
 ### NTF-024 Outgoing Mail Settings
 
