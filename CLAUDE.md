@@ -20,6 +20,7 @@ make migration-version            # Show current migration version
 
 # Frontend (SPA in frontend/, embedded into the binary)
 make web-dev                      # Vite dev server (proxies /api to :8080; run `make dev` too)
+make api-gen                      # Regenerate frontend/src/lib/api/api.ts from docs/swagger.json (run after make swag)
 make web-build                    # Build SPA and copy into internal/shared/delivery/http/webui/dist
 make build                        # web-build + go build
 

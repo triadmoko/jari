@@ -17,8 +17,8 @@
 		"format": "prettier --write .",
 		"test:unit": "bunx --bun vitest",
 		"test": "bun run test:unit --run",
-		"swag-local": "bunx swagger-typescript-api generate -p http://localhost:8080/swagger/doc.json -o ./src/lib/api -n api.ts --axios ",
-		"swag": "bunx swagger-typescript-api generate -p http://domain.com/swagger/doc.json -o ./src/lib/api -n api.ts --axios "
+		"api-gen": "bunx swagger-typescript-api generate -p ../docs/swagger.json -o ./src/lib/api -n api.ts --axios",
+		"api-gen:live": "bunx swagger-typescript-api generate -p http://localhost:8080/swagger/doc.json -o ./src/lib/api -n api.ts --axios"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^2.1.1",
@@ -56,6 +56,7 @@
 		"svelte-check": "^4.7.8",
 		"svelte-sonner": "^1.2.3",
 		"sveltekit-superforms": "^3.1.0",
+		"swagger-typescript-api": "13.13.0",
 		"tailwind-merge": "^3.7.0",
 		"tailwind-variants": "^4.0.1",
 		"tailwindcss": "^4.3.4",

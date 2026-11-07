@@ -45,6 +45,11 @@ migration-version:
 swag:
 	swag init --parseInternal -g cmd/api/main.go --output ./docs
 
+# Regenerate the frontend API client (frontend/src/lib/api/api.ts) from docs/swagger.json.
+# Run after `make swag`; the generator version is pinned in frontend/package.json.
+api-gen:
+	cd frontend && bun run api-gen
+
 # Testing
 test:
 	go test -v ./...

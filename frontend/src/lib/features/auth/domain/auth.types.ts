@@ -3,8 +3,8 @@ export type SessionUser = {
 	email: string;
 	username: string;
 	role: string;
-	first_name?: string;
-	last_name?: string;
+	/** Display name; mirrors `name` in the backend DTOs. Optional so older stored sessions still load. */
+	name?: string;
 };
 
 export type Session = {

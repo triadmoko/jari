@@ -22,8 +22,7 @@ export interface DtoAuthLoginResponse {
 
 export interface DtoAuthRegisterRequest {
   email?: string;
-  first_name?: string;
-  last_name?: string;
+  name?: string;
   password?: string;
   username?: string;
 }
@@ -31,18 +30,15 @@ export interface DtoAuthRegisterRequest {
 export interface DtoAuthRegisterResponse {
   created_at?: string;
   email?: string;
-  first_name?: string;
   id?: string;
   is_active?: boolean;
-  last_name?: string;
+  name?: string;
   role?: string;
-  status?: string;
   username?: string;
 }
 
 export interface DtoUserUpdateProfileRequest {
-  first_name?: string;
-  last_name?: string;
+  name?: string;
 }
 
 export interface DtoUserUserListResponse {
@@ -51,18 +47,12 @@ export interface DtoUserUserListResponse {
 }
 
 export interface DtoUserUserResponse {
-  birth_date?: string;
   created_at?: string;
   email?: string;
-  first_name?: string;
-  gender?: string;
   id?: string;
   is_active?: boolean;
-  last_name?: string;
-  phone?: string;
-  provider?: string;
+  name?: string;
   role?: string;
-  status?: string;
   updated_at?: string;
   username?: string;
 }
@@ -258,14 +248,14 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title Backend API
+ * @title Jari API
  * @version 1.0
  * @license MIT (https://opensource.org/licenses/MIT)
  * @termsOfService http://swagger.io/terms/
  * @baseUrl //localhost:8080/api/v1
  * @contact API Support <support@swagger.io> (http://www.swagger.io/support)
  *
- * A REST API built with Go and Clean Architecture
+ * REST API for Jari, an open-source work and project management platform (Jira clone). "Jari" is the working name until the final product name is decided.
  */
 export class Api<
   SecurityDataType extends unknown,
@@ -324,7 +314,7 @@ export class Api<
       }),
 
     /**
-     * @description Get a paginated and filtered list of users
+     * @description Get a paginated and filtered list of users. Admin only (temporary bridge until the permissions & roles module).
      *
      * @tags users
      * @name V1UsersList
@@ -350,20 +340,10 @@ export class Api<
         email?: string;
         /** Filter by username */
         username?: string;
-        /** Filter by first name (LIKE search) */
-        first_name?: string;
-        /** Filter by last name (LIKE search) */
-        last_name?: string;
-        /** Filter by status */
-        status?: string;
-        /** Filter by gender */
-        gender?: string;
+        /** Filter by name (LIKE search) */
+        name?: string;
         /** Filter by role */
         role?: string;
-        /** Filter by provider */
-        provider?: string;
-        /** Filter by multiple genders (comma-separated) */
-        genders?: string;
         /** Filter by multiple roles (comma-separated) */
         roles?: string;
       },

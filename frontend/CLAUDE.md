@@ -36,7 +36,8 @@ Package manager: **bun** (bun.lock). The root `Dockerfile` builds the frontend i
 - `bun run preview` — preview production build
 - `bun run check` — `svelte-kit sync` + `svelte-check` against `tsconfig.json` (this is the type-check; there is no separate `tsc` step)
 - `bun run lint` / `bun run format` — Prettier check / write
-- `bun run swag-local` — regenerate `src/lib/api/api.ts` from the local backend (`localhost:8080/swagger/doc.json`); you can also point `-p` at `../docs/swagger.json`. Run this whenever the backend contract changes; do not hand-edit `src/lib/api/api.ts`.
+- `bun run api-gen` — regenerate `src/lib/api/api.ts` from `../docs/swagger.json` (generator `swagger-typescript-api` is pinned in `devDependencies`, so the output is reproducible). From the repo root, `make swag api-gen` refreshes the spec and the client in one go. Run this whenever the backend contract changes; do not hand-edit `src/lib/api/api.ts`.
+- `bun run api-gen:live` — same, but reads the spec from a running backend (`localhost:8080/swagger/doc.json`).
 - `bun run test` — vitest (unit tests live next to the code as `*.test.ts`)
 
 ## Architecture
