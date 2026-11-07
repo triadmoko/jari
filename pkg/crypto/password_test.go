@@ -31,7 +31,7 @@ func TestHashPasswordWithCost_Success(t *testing.T) {
 
 func TestHashPasswordWithCost_InvalidCost(t *testing.T) {
 	password := "testPassword123"
-	cost := 100 // Invalid cost (too high)
+	cost := 100
 
 	_, err := HashPasswordWithCost(password, cost)
 

@@ -5,7 +5,6 @@ import (
 	"context"
 )
 
-// UserRepository defines the interface for user data operations
 type UserRepository interface {
 	Create(ctx context.Context, user *entity.User) error
 	GetByID(ctx context.Context, id string) (*entity.User, error)

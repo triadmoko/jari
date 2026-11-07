@@ -1,8 +1,6 @@
 package entity
 
-// FilterUser represents the filtering options for user queries
 type FilterUser struct {
-	// Basic filters
 	ID       string `json:"id,omitempty"`
 	Email    string `json:"email,omitempty"`
 	Username string `json:"username,omitempty"`
@@ -11,10 +9,8 @@ type FilterUser struct {
 
 	Role string `json:"role,omitempty"`
 
-	// Array filters for IN queries
 	Roles []string `json:"roles,omitempty"`
 
-	// Pagination
 	Offset  int `json:"offset"`
 	PerPage int `json:"per_page"`
 }

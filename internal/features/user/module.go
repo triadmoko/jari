@@ -11,28 +11,23 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Module is the user feature module that combines DI and route registration
 type Module struct {
 	handler   *handler.UserHandler
 	userRepo  repository.UserRepository
 	jwtSecret string
 }
 
-// NewModule creates and wires all user feature dependencies
 func NewModule(userRepo repository.UserRepository, logger *logrus.Logger, jwtSecret string) *Module {
-	// Wire dependencies
 	uc := usecase.NewUserUsecase(userRepo, logger)
 	h := handler.NewUserHandler(uc)
 
 	return &Module{handler: h, userRepo: userRepo, jwtSecret: jwtSecret}
 }
 
-// Name returns the feature name
 func (m *Module) Name() string {
 	return "user"
 }
 
-// RegisterRoutes registers all user routes
 func (m *Module) RegisterRoutes(rg *gin.RouterGroup) {
 	users := rg.Group("/users")
 	{

@@ -7,12 +7,10 @@ import (
 	"time"
 )
 
-// UpdateProfileRequest represents the request for updating user profile
 type UpdateProfileRequest struct {
 	Name string `json:"name"`
 }
 
-// Validate validates UpdateProfileRequest fields
 func (r *UpdateProfileRequest) Validate(lang constants.Lang) map[string][]string {
 	errors := make(map[string][]string)
 
@@ -23,7 +21,6 @@ func (r *UpdateProfileRequest) Validate(lang constants.Lang) map[string][]string
 	return errors
 }
 
-// UserResponse represents a user data in response
 type UserResponse struct {
 	ID        string    `json:"id"`
 	Email     string    `json:"email"`
@@ -35,7 +32,6 @@ type UserResponse struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-// ToUserResponse converts entity.User to UserResponse
 func ToUserResponse(user *entity.User) *UserResponse {
 	if user == nil {
 		return nil
@@ -53,7 +49,6 @@ func ToUserResponse(user *entity.User) *UserResponse {
 	}
 }
 
-// UserListResponse represents the response for listing users with pagination
 type UserListResponse struct {
 	Users      []*UserResponse        `json:"users"`
 	Pagination pkg.PaginationResponse `json:"pagination"`

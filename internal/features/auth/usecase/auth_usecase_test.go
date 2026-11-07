@@ -48,11 +48,8 @@ func TestRegister_Success(t *testing.T) {
 		Name:     "Test User",
 	}
 
-	// Mock: email not found
 	mockRepo.EXPECT().GetByEmail(ctx, req.Email).Return(nil, errors.New("not found"))
-	// Mock: username not found
 	mockRepo.EXPECT().GetByUsername(ctx, req.Username).Return(nil, errors.New("not found"))
-	// Mock: create user success
 	mockRepo.EXPECT().Create(ctx, mock.AnythingOfType("*entity.User")).Return(nil)
 
 	user, status, err := uc.Register(ctx, req)
@@ -81,7 +78,6 @@ func TestRegister_UserAlreadyExists(t *testing.T) {
 		Email: req.Email,
 	}
 
-	// Mock: email already exists
 	mockRepo.EXPECT().GetByEmail(ctx, req.Email).Return(existingUser, nil)
 
 	user, status, err := uc.Register(ctx, req)
@@ -107,9 +103,7 @@ func TestRegister_UsernameAlreadyTaken(t *testing.T) {
 		Username: req.Username,
 	}
 
-	// Mock: email not found
 	mockRepo.EXPECT().GetByEmail(ctx, req.Email).Return(nil, errors.New("not found"))
-	// Mock: username already exists
 	mockRepo.EXPECT().GetByUsername(ctx, req.Username).Return(existingUser, nil)
 
 	user, status, err := uc.Register(ctx, req)
@@ -130,11 +124,8 @@ func TestRegister_CreateUserError(t *testing.T) {
 		Name:     "Test User",
 	}
 
-	// Mock: email not found
 	mockRepo.EXPECT().GetByEmail(ctx, req.Email).Return(nil, errors.New("not found"))
-	// Mock: username not found
 	mockRepo.EXPECT().GetByUsername(ctx, req.Username).Return(nil, errors.New("not found"))
-	// Mock: create user fails
 	mockRepo.EXPECT().Create(ctx, mock.AnythingOfType("*entity.User")).Return(errors.New("database error"))
 
 	user, status, err := uc.Register(ctx, req)
@@ -164,7 +155,6 @@ func TestLogin_Success(t *testing.T) {
 		Password: hashedPassword,
 	}
 
-	// Mock: get user by email success
 	mockRepo.EXPECT().GetByEmail(ctx, req.Email).Return(existingUser, nil)
 
 	loginResp, status, err := uc.Login(ctx, req)
@@ -185,7 +175,6 @@ func TestLogin_UserNotFound(t *testing.T) {
 		Password: "password123",
 	}
 
-	// Mock: user not found
 	mockRepo.EXPECT().GetByEmail(ctx, req.Email).Return(nil, errors.New("not found"))
 
 	loginResp, status, err := uc.Login(ctx, req)
@@ -215,7 +204,6 @@ func TestLogin_InvalidPassword(t *testing.T) {
 		Password: hashedPassword,
 	}
 
-	// Mock: get user by email success
 	mockRepo.EXPECT().GetByEmail(ctx, req.Email).Return(existingUser, nil)
 
 	loginResp, status, err := uc.Login(ctx, req)

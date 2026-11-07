@@ -13,7 +13,6 @@ export function safeRedirectTarget(value: string | null | undefined): string | n
 	return value;
 }
 
-/** Where to go after a successful login: a safe redirectTo, otherwise home. */
 export function postLoginTarget(redirectTo?: string | null): string {
 	return safeRedirectTarget(redirectTo) ?? AUTH_ROUTES.home;
 }

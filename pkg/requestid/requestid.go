@@ -12,15 +12,12 @@ import (
 // Header is the HTTP header used to receive and echo the request ID.
 const Header = "X-Request-ID"
 
-// maxLen caps the length of an ID accepted from a client.
 const maxLen = 128
 
 type ctxKey struct{}
 
-// New generates a fresh request ID.
 func New() string { return uuid.NewString() }
 
-// NewContext returns a copy of ctx carrying the request ID.
 func NewContext(ctx context.Context, id string) context.Context {
 	return context.WithValue(ctx, ctxKey{}, id)
 }

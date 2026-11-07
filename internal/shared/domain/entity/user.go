@@ -14,7 +14,6 @@ const (
 	RoleAdmin = "admin"
 )
 
-// User represents a user entity in the domain layer
 type User struct {
 	ID        string         `json:"id" gorm:"type:varchar(36);primaryKey"`
 	Email     string         `json:"email" gorm:"type:varchar(255);uniqueIndex;not null"`
@@ -28,12 +27,10 @@ type User struct {
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 }
 
-// TableName specifies the table name for GORM
 func (User) TableName() string {
 	return "users"
 }
 
-// NewUser creates a new user entity with generated UUID
 func NewUser(email, username, password, name string) *User {
 	return &User{
 		ID:       uuid.New().String(),
@@ -45,7 +42,6 @@ func NewUser(email, username, password, name string) *User {
 	}
 }
 
-// BeforeCreate hook to ensure UUID is set
 func (u *User) BeforeCreate(tx *gorm.DB) error {
 	if u.ID == "" {
 		u.ID = uuid.New().String()

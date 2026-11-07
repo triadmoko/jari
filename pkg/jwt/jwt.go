@@ -7,7 +7,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// Claims represents JWT claims
 type Claims struct {
 	UserID   string `json:"user_id"`
 	Email    string `json:"email"`
@@ -15,19 +14,16 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-// UserPayload represents user data for token generation
 type UserPayload struct {
 	ID       string
 	Email    string
 	Username string
 }
 
-// GenerateToken generates a JWT token for the given user payload
 func GenerateToken(secret string, user UserPayload) (string, error) {
 	return GenerateTokenWithExpiry(secret, user, 24*time.Hour)
 }
 
-// GenerateTokenWithExpiry generates a JWT token with custom expiry duration
 func GenerateTokenWithExpiry(secret string, user UserPayload, expiry time.Duration) (string, error) {
 	claims := &Claims{
 		UserID:   user.ID,
@@ -44,7 +40,6 @@ func GenerateTokenWithExpiry(secret string, user UserPayload, expiry time.Durati
 	return token.SignedString([]byte(secret))
 }
 
-// ValidateToken validates a JWT token and returns the claims
 func ValidateToken(secret, tokenString string) (*Claims, error) {
 	claims := &Claims{}
 

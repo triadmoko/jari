@@ -18,14 +18,12 @@ import (
 // MigrationsTable is the table golang-migrate uses to track the schema version.
 const MigrationsTable = "schema_migrations"
 
-// Usage describes the migrate subcommand.
 const Usage = `usage: migrate <command>
   up              apply all pending migrations
   down [N|all]    roll back N migrations (default 1) or all of them
   version         print the current schema version
   force V         set the schema version to V and clear the dirty flag`
 
-// ErrUsage is returned when the migrate arguments are invalid.
 var ErrUsage = errors.New(Usage)
 
 // SchemaError reports that the database schema does not match the migrations

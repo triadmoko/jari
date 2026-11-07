@@ -8,7 +8,6 @@ package brand
 import "net/http"
 
 const (
-	// Name is the display name shown to users.
 	Name = "Jari"
 	// Slug is the lowercase identifier for image names, labels, and storage keys.
 	Slug = "jari"

@@ -33,7 +33,6 @@ func RegisterRoutes(r *gin.Engine) {
 	r.NoRoute(Handler(sub))
 }
 
-// Handler returns the SPA fallback handler for the given build output.
 func Handler(root fs.FS) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		reqPath := c.Request.URL.Path

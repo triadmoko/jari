@@ -9,17 +9,14 @@ import (
 	"gorm.io/gorm"
 )
 
-// userRepository implements repository.UserRepository interface
 type userRepository struct {
 	db *gorm.DB
 }
 
-// NewUserRepository creates a new user repository
 func NewUserRepository(db *gorm.DB) repository.UserRepository {
 	return &userRepository{db: db}
 }
 
-// Create creates a new user
 func (r *userRepository) Create(ctx context.Context, user *entity.User) error {
 	result := r.db.WithContext(ctx).Create(user)
 	if result.Error != nil {
@@ -28,7 +25,6 @@ func (r *userRepository) Create(ctx context.Context, user *entity.User) error {
 	return nil
 }
 
-// GetByID retrieves a user by ID (UUID string)
 func (r *userRepository) GetByID(ctx context.Context, id string) (*entity.User, error) {
 	var user entity.User
 	result := r.db.WithContext(ctx).Where("id = ?", id).First(&user)
@@ -38,7 +34,6 @@ func (r *userRepository) GetByID(ctx context.Context, id string) (*entity.User, 
 	return &user, nil
 }
 
-// GetByEmail retrieves a user by email
 func (r *userRepository) GetByEmail(ctx context.Context, email string) (*entity.User, error) {
 	var user entity.User
 	result := r.db.WithContext(ctx).Where("email = ?", email).First(&user)
@@ -48,7 +43,6 @@ func (r *userRepository) GetByEmail(ctx context.Context, email string) (*entity.
 	return &user, nil
 }
 
-// GetByUsername retrieves a user by username
 func (r *userRepository) GetByUsername(ctx context.Context, username string) (*entity.User, error) {
 	var user entity.User
 	if err := r.db.WithContext(ctx).Where("username = ?", username).First(&user).Error; err != nil {
@@ -57,7 +51,6 @@ func (r *userRepository) GetByUsername(ctx context.Context, username string) (*e
 	return &user, nil
 }
 
-// Update updates a user
 func (r *userRepository) Update(ctx context.Context, filter entity.FilterUser, user *entity.User) error {
 	result := r.db.WithContext(ctx).Where("deleted_at IS NULL AND id = ?", filter.ID).Updates(user)
 	if result.Error != nil {
@@ -74,17 +67,13 @@ func (r *userRepository) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-// List retrieves a list of users with pagination and filtering
 func (r *userRepository) List(ctx context.Context, filter entity.FilterUser) ([]*entity.User, int, error) {
-	// Build scopes for dynamic query construction
 	scopes := []func(db *gorm.DB) *gorm.DB{
-		// Soft delete filter - only get non-deleted records
 		func(db *gorm.DB) *gorm.DB {
 			return db.Where("deleted_at IS NULL")
 		},
 	}
 
-	// Basic field filters
 	if filter.ID != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
 			return db.Where("id = ?", filter.ID)
@@ -117,14 +106,12 @@ func (r *userRepository) List(ctx context.Context, filter entity.FilterUser) ([]
 		})
 	}
 
-	// Array filters for IN queries
 	if len(filter.Roles) > 0 {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
 			return db.Where("role IN ?", filter.Roles)
 		})
 	}
 
-	// Query with pagination and filters
 	var users []*entity.User
 	err := r.db.WithContext(ctx).
 		Scopes(pkg.Paginate(filter.Offset, filter.PerPage, r.db)).
@@ -134,7 +121,6 @@ func (r *userRepository) List(ctx context.Context, filter entity.FilterUser) ([]
 		return nil, 0, err
 	}
 
-	// Get total count for pagination
 	var totalRows int64
 	if err := r.db.WithContext(ctx).Model(&entity.User{}).Scopes(scopes...).Count(&totalRows).Error; err != nil {
 		return nil, 0, err

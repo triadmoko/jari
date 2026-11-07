@@ -14,20 +14,17 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// AuthUsecase defines the interface for authentication use cases
 type AuthUsecase interface {
 	Register(ctx context.Context, req dto_auth.RegisterRequest) (*dto_auth.RegisterResponse, int, error)
 	Login(ctx context.Context, req dto_auth.LoginRequest) (*dto_auth.LoginResponse, int, error)
 }
 
-// authUsecase implements AuthUsecase interface
 type authUsecase struct {
 	userRepo  repository.UserRepository
 	logger    *logrus.Logger
 	jwtSecret string
 }
 
-// NewAuthUsecase creates a new auth usecase
 func NewAuthUsecase(userRepo repository.UserRepository, logger *logrus.Logger, jwtSecret string) AuthUsecase {
 	return &authUsecase{
 		userRepo:  userRepo,
@@ -36,56 +33,46 @@ func NewAuthUsecase(userRepo repository.UserRepository, logger *logrus.Logger, j
 	}
 }
 
-// Register creates a new user
 func (a *authUsecase) Register(ctx context.Context, req dto_auth.RegisterRequest) (*dto_auth.RegisterResponse, int, error) {
 	lang := middleware.GetLangFromContext(ctx)
 
-	// Check if user already exists by email
 	existingUser, _ := a.userRepo.GetByEmail(ctx, req.Email)
 	if existingUser != nil {
 		a.logger.WithContext(ctx).Error("a.userRepo.GetByEmail: user already exists")
 		return nil, http.StatusBadRequest, constants.GetError(constants.UserAlreadyExists, lang)
 	}
 
-	// Check if username is taken
 	existingUser, _ = a.userRepo.GetByUsername(ctx, req.Username)
 	if existingUser != nil {
 		a.logger.WithContext(ctx).Error("a.userRepo.GetByUsername: username already taken")
 		return nil, http.StatusBadRequest, constants.GetError(constants.UsernameAlreadyTaken, lang)
 	}
 
-	// Hash password
 	hashedPassword, err := crypto.HashPassword(req.Password)
 	if err != nil {
 		a.logger.WithContext(ctx).Error("crypto.HashPassword ", err)
 		return nil, http.StatusInternalServerError, constants.GetError(constants.FailedToHashPassword, lang)
 	}
 
-	// Create user entity using shared entity
 	user := entity.NewUser(req.Email, req.Username, hashedPassword, req.Name)
 
-	// Save user
 	if err := a.userRepo.Create(ctx, user); err != nil {
 		a.logger.WithContext(ctx).Error("a.userRepo.Create ", err)
 		return nil, http.StatusInternalServerError, constants.GetError(constants.FailedToCreateUser, lang)
 	}
 
-	// Convert to DTO response
 	return dto_auth.ToRegisterResponse(user), http.StatusCreated, nil
 }
 
-// Login authenticates a user
 func (a *authUsecase) Login(ctx context.Context, req dto_auth.LoginRequest) (*dto_auth.LoginResponse, int, error) {
 	lang := middleware.GetLangFromContext(ctx)
 
-	// Get user by email
 	user, err := a.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
 		a.logger.WithContext(ctx).Error("a.userRepo.GetByEmail ", err)
 		return nil, http.StatusUnauthorized, constants.GetError(constants.InvalidCredentials, lang)
 	}
 
-	// Verify password
 	if err := crypto.VerifyPassword(user.Password, req.Password); err != nil {
 		a.logger.WithContext(ctx).Error("crypto.VerifyPassword ", err)
 		return nil, http.StatusUnauthorized, constants.GetError(constants.InvalidCredentials, lang)
@@ -102,7 +89,6 @@ func (a *authUsecase) Login(ctx context.Context, req dto_auth.LoginRequest) (*dt
 		return nil, http.StatusInternalServerError, constants.GetError(constants.FailedToGenerateToken, lang)
 	}
 
-	// Convert to DTO response
 	return &dto_auth.LoginResponse{
 		User:  dto_auth.ToRegisterResponse(user),
 		Token: token,

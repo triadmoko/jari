@@ -91,8 +91,7 @@ func TestValidateToken_ExpiredToken(t *testing.T) {
 		Username: "testuser",
 	}
 
-	// Generate token with very short expiry
-	token, err := GenerateTokenWithExpiry(secret, user, -1*time.Hour) // Already expired
+	token, err := GenerateTokenWithExpiry(secret, user, -1*time.Hour)
 	require.NoError(t, err)
 
 	claims, err := ValidateToken(secret, token)

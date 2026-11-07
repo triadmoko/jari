@@ -21,16 +21,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Feature defines the interface that each feature module must implement
 type Feature interface {
-	// Name returns the feature name for logging/debugging
 	Name() string
-	// RegisterRoutes registers all routes for this feature
-	// rg: the base router group (/api/v1)
 	RegisterRoutes(rg *gin.RouterGroup)
 }
 
-// App holds the application and its dependencies
 type App struct {
 	Config *config.Config
 	DB     *database.PostgresDB
@@ -38,7 +33,6 @@ type App struct {
 	Logger *logrus.Logger
 }
 
-// New creates and initializes the application
 func New() (*App, error) {
 	app := &App{}
 
@@ -53,7 +47,6 @@ func New() (*App, error) {
 	// JSON logs in production, colored text otherwise; LOG_LEVEL sets verbosity.
 	app.Logger = logger.NewLogger(cfg.Log.Level, cfg.JSONLogs())
 
-	// Initialize database
 	db, err := database.NewPostgresDB(cfg.Database, database.GormLogLevel(cfg.Env, cfg.Log.Level))
 	if err != nil {
 		return nil, err
@@ -71,18 +64,15 @@ func New() (*App, error) {
 		return nil, err
 	}
 
-	// Setup router with features
 	app.Engine = app.setupRouter()
 
 	return app, nil
 }
 
-// setupRouter configures the HTTP router and registers all features
 func (a *App) setupRouter() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 
-	// Global middleware
 	router.Use(middleware.RequestIDMiddleware()) // first: every later log line needs the ID
 	router.Use(middleware.LoggerMiddleware(a.Logger))
 	router.Use(middleware.RecoveryMiddleware(a.Logger))
@@ -92,13 +82,10 @@ func (a *App) setupRouter() *gin.Engine {
 	// Health probes: /health/live (process), /health/ready (DB + schema), /health (alias of live)
 	health.New(a.Logger, a.readinessChecks()...).RegisterRoutes(router)
 
-	// API v1 routes
 	v1 := router.Group("/api/v1")
 
-	// Initialize shared repository
 	userRepo := sharedRepo.NewUserRepository(a.DB.GetDB())
 
-	// Register all features - just add one line per new feature!
 	features := []Feature{
 		auth.NewModule(userRepo, a.Logger, a.Config.JWT.Secret),
 		user.NewModule(userRepo, a.Logger, a.Config.JWT.Secret),
@@ -138,7 +125,6 @@ func (a *App) readinessChecks() []health.Check {
 	}
 }
 
-// Close releases all resources held by the application
 func (a *App) Close() error {
 	if a.DB != nil {
 		return a.DB.Close()

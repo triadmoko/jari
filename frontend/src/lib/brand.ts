@@ -4,7 +4,6 @@
  */
 export const PRODUCT_NAME = 'Jari';
 
-/** Lowercase identifier for storage keys and the like. */
 export const PRODUCT_SLUG = 'jari';
 
 /** `Masuk · Jari`; the bare product name when there is no section. */

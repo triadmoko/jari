@@ -62,14 +62,12 @@ function getLanguage(language: string) {
 	return aliases[name] ?? null;
 }
 
-// One highlighted token. Render it as a `<span>` with this style and class.
 export type HighlightedToken = {
 	content: string;
 	style?: string;
 	class?: string;
 };
 
-// A line of plain text, or the highlighted tokens of a line.
 export type HighlightedLine = string | HighlightedToken[];
 
 function toHighlightedLine(tokens: ThemedToken[]): HighlightedToken[] {
@@ -84,8 +82,6 @@ function toHighlightedLine(tokens: ThemedToken[]): HighlightedToken[] {
 
 export type Highlighter = NonNullable<Awaited<ReturnType<typeof loadHighlighter>>>;
 
-// Loads a language and returns a highlighter for it, or null for a language
-// that is not listed.
 export async function loadHighlighter(language: string) {
 	const lang = getLanguage(language);
 
@@ -124,7 +120,6 @@ export async function loadHighlighter(language: string) {
 	};
 }
 
-// Returns the tokens of each line, or null for a language that is not listed.
 export async function highlightCode(code: string, language: string) {
 	const highlighter = await loadHighlighter(language);
 

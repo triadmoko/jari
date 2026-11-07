@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// clearEnv resets every variable Parse reads so tests do not depend on the host.
 func clearEnv(t *testing.T) {
 	t.Helper()
 	for _, k := range []string{

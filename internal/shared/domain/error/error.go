@@ -2,7 +2,6 @@ package error
 
 import "errors"
 
-// Domain errors
 var (
 	ErrUserNotFound       = errors.New("user not found")
 	ErrInvalidCredentials = errors.New("invalid credentials")
@@ -13,7 +12,6 @@ var (
 	ErrInternalServer     = errors.New("internal server error")
 )
 
-// CustomError represents a custom error with additional context
 type CustomError struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
@@ -27,7 +25,6 @@ func (e *CustomError) Error() string {
 	return e.Message
 }
 
-// NewCustomError creates a new custom error
 func NewCustomError(code int, message string, err error) *CustomError {
 	return &CustomError{
 		Code:    code,

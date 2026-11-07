@@ -10,7 +10,6 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-// PostgresDB represents a PostgreSQL database connection using GORM
 type PostgresDB struct {
 	DB *gorm.DB
 }
@@ -36,8 +35,7 @@ func GormLogLevel(env, logLevel string) logger.LogLevel {
 	return logger.Warn
 }
 
-// NewPostgresDB creates a new PostgreSQL database connection using GORM.
-// gormLevel sets the verbosity of GORM's own logger (see GormLogLevel).
+// NewPostgresDB connects to PostgreSQL. gormLevel sets the verbosity of GORM's own logger (see GormLogLevel).
 func NewPostgresDB(cfg config.DatabaseConfig, gormLevel logger.LogLevel) (*PostgresDB, error) {
 	dsn := cfg.URL
 	if dsn == "" {
@@ -52,17 +50,14 @@ func NewPostgresDB(cfg config.DatabaseConfig, gormLevel logger.LogLevel) (*Postg
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	// Get underlying sql.DB for connection pool configuration
 	sqlDB, err := db.DB()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get underlying sql.DB: %w", err)
 	}
 
-	// Configure connection pool
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
 
-	// Test the connection
 	if err := sqlDB.Ping(); err != nil {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
@@ -72,7 +67,6 @@ func NewPostgresDB(cfg config.DatabaseConfig, gormLevel logger.LogLevel) (*Postg
 	return &PostgresDB{DB: db}, nil
 }
 
-// Close closes the database connection
 func (p *PostgresDB) Close() error {
 	sqlDB, err := p.DB.DB()
 	if err != nil {
@@ -81,7 +75,6 @@ func (p *PostgresDB) Close() error {
 	return sqlDB.Close()
 }
 
-// Ping checks the database connection
 func (p *PostgresDB) Ping() error {
 	sqlDB, err := p.DB.DB()
 	if err != nil {
@@ -90,7 +83,6 @@ func (p *PostgresDB) Ping() error {
 	return sqlDB.Ping()
 }
 
-// GetDB returns the GORM database instance
 func (p *PostgresDB) GetDB() *gorm.DB {
 	return p.DB
 }

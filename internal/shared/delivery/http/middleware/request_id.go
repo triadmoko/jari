@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// RequestIDKey is the gin context key holding the request ID.
 const RequestIDKey = "request_id"
 
 // RequestIDMiddleware assigns every request a correlation ID. It reuses a

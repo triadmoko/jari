@@ -29,26 +29,22 @@ type Check struct {
 	Fn   func(ctx context.Context) error
 }
 
-// Handler serves the health endpoints.
 type Handler struct {
 	checks  []Check
 	timeout time.Duration
 	log     *logrus.Logger
 }
 
-// New creates a Handler that evaluates checks for readiness.
 func New(log *logrus.Logger, checks ...Check) *Handler {
 	return &Handler{checks: checks, timeout: DefaultTimeout, log: log}
 }
 
-// RegisterRoutes mounts /health, /health/live and /health/ready on r.
 func (h *Handler) RegisterRoutes(r gin.IRoutes) {
 	r.GET("/health", h.Live)
 	r.GET("/health/live", h.Live)
 	r.GET("/health/ready", h.Ready)
 }
 
-// Live reports that the process is running.
 func (h *Handler) Live(c *gin.Context) {
 	c.Header("Cache-Control", "no-store")
 	c.JSON(http.StatusOK, gin.H{

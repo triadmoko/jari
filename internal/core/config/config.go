@@ -7,7 +7,6 @@ import (
 	"strings"
 )
 
-// Supported values for the ENV variable.
 const (
 	EnvDevelopment = "development"
 	EnvProduction  = "production"
@@ -33,7 +32,6 @@ var insecureJWTSecrets = map[string]struct{}{
 	developmentJWTSecret: {},
 }
 
-// Config holds all configuration for our application
 type Config struct {
 	Env      string
 	Server   ServerConfig
@@ -43,13 +41,11 @@ type Config struct {
 	Log      LogConfig
 }
 
-// ServerConfig holds server configuration
 type ServerConfig struct {
 	Port string
 	Host string
 }
 
-// DatabaseConfig holds database configuration
 type DatabaseConfig struct {
 	URL     string
 	Host    string
@@ -60,20 +56,16 @@ type DatabaseConfig struct {
 	SSLMode string
 }
 
-// JWTConfig holds JWT configuration
 type JWTConfig struct {
 	Secret string
 }
 
-// CORSConfig holds the cross-origin allowlist.
 type CORSConfig struct {
-	// AllowedOrigins lists the origins permitted to make cross-origin requests.
 	// A "*" entry allows every origin (without credentials).
 	// Empty means every cross-origin request is rejected (same-origin still works).
 	AllowedOrigins []string
 }
 
-// LogConfig holds logging configuration.
 type LogConfig struct {
 	// Level is the LOG_LEVEL value (trace|debug|info|warn|error|fatal|panic),
 	// lowercased. Empty means "not set": the app logs at info and the GORM
@@ -81,7 +73,6 @@ type LogConfig struct {
 	Level string
 }
 
-// validLogLevels are the accepted LOG_LEVEL values.
 var validLogLevels = map[string]struct{}{
 	"trace": {}, "debug": {}, "info": {}, "warn": {}, "warning": {},
 	"error": {}, "fatal": {}, "panic": {},
@@ -91,10 +82,8 @@ var validLogLevels = map[string]struct{}{
 // the colored text used for local development.
 func (c *Config) JSONLogs() bool { return c.IsProduction() }
 
-// IsDevelopment reports whether the app runs with ENV=development.
 func (c *Config) IsDevelopment() bool { return c.Env == EnvDevelopment }
 
-// IsProduction reports whether the app runs with ENV=production.
 func (c *Config) IsProduction() bool { return c.Env == EnvProduction }
 
 // Parse reads configuration from environment variables without validating it.
@@ -203,7 +192,6 @@ func (c *Config) validateJWT() error {
 	return nil
 }
 
-// getEnv gets an environment variable with a fallback value
 func getEnv(key, fallback string) string {
 	if value := os.Getenv(key); value != "" {
 		return value

@@ -12,12 +12,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// UserHandler handles HTTP requests for user operations
 type UserHandler struct {
 	userUsecase usecase.UserUsecase
 }
 
-// NewUserHandler creates a new user handler
 func NewUserHandler(userUsecase usecase.UserUsecase) *UserHandler {
 	return &UserHandler{
 		userUsecase: userUsecase,
@@ -40,7 +38,6 @@ func NewUserHandler(userUsecase usecase.UserUsecase) *UserHandler {
 func (h *UserHandler) GetProfile(c *gin.Context) {
 	lang := middleware.GetLangFromGin(c)
 
-	// Get claims from context
 	claimsVal, exists := c.Get("sess")
 	if !exists {
 		response.NewResponse(c, http.StatusUnauthorized, nil, constants.GetErrorMessage(constants.Unauthorized, lang), nil)
@@ -80,7 +77,6 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	lang := middleware.GetLangFromGin(c)
 
-	// Get claims from context
 	claimsVal, exists := c.Get("sess")
 	if !exists {
 		response.NewResponse(c, http.StatusUnauthorized, nil, constants.GetErrorMessage(constants.Unauthorized, lang), nil)
@@ -101,7 +97,6 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	// Validate request
 	if errors := req.Validate(lang); len(errors) > 0 {
 		response.NewResponse(c, http.StatusBadRequest, nil, constants.GetErrorMessage(constants.ValidationFailed, lang), errors)
 		return
@@ -139,7 +134,6 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 //	@Failure		500			{object}	response.Response
 //	@Router			/api/v1/users [get]
 func (h *UserHandler) GetUsers(c *gin.Context) {
-	// Build queries map from query parameters
 	queries := map[string]string{}
 
 	err := c.BindQuery(&queries)
@@ -157,7 +151,6 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 		return
 	}
 
-	// Build response with DTO
 	responseData := dto_user.UserListResponse{
 		Users:      users,
 		Pagination: pagination,

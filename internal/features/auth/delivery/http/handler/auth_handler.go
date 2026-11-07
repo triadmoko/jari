@@ -11,12 +11,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AuthHandler handles HTTP requests for authentication operations
 type AuthHandler struct {
 	authUsecase usecase.AuthUsecase
 }
 
-// NewAuthHandler creates a new auth handler
 func NewAuthHandler(authUsecase usecase.AuthUsecase) *AuthHandler {
 	return &AuthHandler{
 		authUsecase: authUsecase,
@@ -46,7 +44,6 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	// Validate request
 	if errors := req.Validate(lang); len(errors) > 0 {
 		response.NewResponse(c, http.StatusBadRequest, nil, constants.GetErrorMessage(constants.ValidationFailed, lang), errors)
 		return
@@ -85,7 +82,6 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	// Validate request
 	if errors := req.Validate(lang); len(errors) > 0 {
 		response.NewResponse(c, http.StatusBadRequest, nil, constants.GetErrorMessage(constants.ValidationFailed, lang), errors)
 		return

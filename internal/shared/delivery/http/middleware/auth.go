@@ -14,7 +14,6 @@ const (
 	SESS = "sess"
 )
 
-// AuthMiddleware creates an authentication middleware that validates tokens signed with jwtSecret
 func AuthMiddleware(jwtSecret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		lang := GetLangFromGin(c)
@@ -26,14 +25,12 @@ func AuthMiddleware(jwtSecret string) gin.HandlerFunc {
 			return
 		}
 
-		// Check if the header starts with "Bearer "
 		if !strings.HasPrefix(authHeader, "Bearer ") {
 			response.NewResponse(c, http.StatusUnauthorized, nil, constants.GetErrorMessage(constants.Unauthorized, lang), nil)
 			c.Abort()
 			return
 		}
 
-		// Extract the token
 		token := strings.TrimPrefix(authHeader, "Bearer ")
 		if token == "" {
 			response.NewResponse(c, http.StatusUnauthorized, nil, constants.GetErrorMessage(constants.Unauthorized, lang), nil)
@@ -41,7 +38,6 @@ func AuthMiddleware(jwtSecret string) gin.HandlerFunc {
 			return
 		}
 
-		// Validate the token
 		claims, err := jwt.ValidateToken(jwtSecret, token)
 		if err != nil {
 			response.NewResponse(c, http.StatusUnauthorized, nil, constants.GetErrorMessage(constants.Unauthorized, lang), nil)
@@ -49,7 +45,6 @@ func AuthMiddleware(jwtSecret string) gin.HandlerFunc {
 			return
 		}
 
-		// Set user information in context (all strings now)
 		c.Set(SESS, claims)
 		c.Next()
 	}
