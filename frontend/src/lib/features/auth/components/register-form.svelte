@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import type { FieldErrors } from '#lib/api/result.js';
+	import { PRODUCT_NAME } from '#lib/brand.js';
 	import FormField from '#lib/components/form-field.svelte';
 	import * as Alert from '#lib/components/ui/alert/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
@@ -37,6 +38,8 @@
 			return;
 		}
 
+		// The path goes through resolve(); the rule cannot see it through the query suffix.
+		// eslint-disable-next-line svelte/no-navigation-without-resolve
 		await goto(`${resolve(AUTH_ROUTES.login)}?registered=1`);
 	}
 </script>
@@ -44,7 +47,7 @@
 <Card.Root class="w-full max-w-sm">
 	<Card.Header>
 		<Card.Title>Daftar</Card.Title>
-		<Card.Description>Buat akun baru untuk mulai memakai Jari.</Card.Description>
+		<Card.Description>Buat akun baru untuk mulai memakai {PRODUCT_NAME}.</Card.Description>
 	</Card.Header>
 	<Card.Content>
 		<form {onsubmit} novalidate class="flex flex-col gap-4">

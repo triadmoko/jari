@@ -30,11 +30,17 @@ COPY . .
 # Embed the compiled SPA into the binary (go:embed in webui)
 COPY --from=web /web/build ./internal/shared/delivery/http/webui/dist
 
-# Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./cmd/api
+# Build the application (VERSION is reported in the User-Agent of outgoing requests, see pkg/brand)
+ARG VERSION=dev
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo \
+    -ldflags "-X app/pkg/brand.Version=${VERSION}" -o main ./cmd/api
 
 # Final stage
 FROM alpine:latest
+
+# Keep in sync with pkg/brand
+LABEL org.opencontainers.image.title="Jari" \
+      org.opencontainers.image.description="Open-source work and project management platform"
 
 # Install ca-certificates for HTTPS requests
 RUN apk --no-cache add ca-certificates

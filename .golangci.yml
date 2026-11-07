@@ -1,0 +1,19 @@
+version: "2"
+
+linters:
+  default: standard
+  settings:
+    errcheck:
+      # Diagnostics output; a failed write is not actionable.
+      exclude-functions:
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - fmt.Fprint
+  exclusions:
+    rules:
+      # Best-effort cleanup (defer x.Close()); the error is not actionable.
+      - linters: [errcheck]
+        text: "Error return value of `[^`]*\\.Close` is not checked"
+
+run:
+  timeout: 5m

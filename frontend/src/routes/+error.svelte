@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import { pageTitle } from '#lib/brand.js';
 	import { AUTH_ROUTES } from '#lib/features/auth/index.js';
 </script>
 
-<svelte:head><title>{page.status} · Jari</title></svelte:head>
+<svelte:head><title>{pageTitle(String(page.status))}</title></svelte:head>
 
 <main class="flex min-h-svh flex-col items-center justify-center gap-2 p-6 text-center">
 	<h1 class="text-4xl font-semibold">{page.status}</h1>

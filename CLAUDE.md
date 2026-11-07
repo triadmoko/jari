@@ -157,6 +157,7 @@ All config loaded via `internal/core/config/` from environment variables. Requir
 
 ## Development Notes
 
+- Product name lives only in `pkg/brand` (Go) and `frontend/src/lib/brand.ts` (SPA); never hard-code "Jari" elsewhere (Swagger annotations and the Dockerfile label are the unavoidable static copies)
 - The module path is `app` (see go.mod)
 - Database uses GORM with PostgreSQL
 - Gin runs in release mode by default

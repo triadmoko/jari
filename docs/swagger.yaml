@@ -106,8 +106,8 @@ info:
   description: REST API for Jari, an open-source work and project management platform
     (Jira clone). "Jari" is the working name until the final product name is decided.
   license:
-    name: MIT
-    url: https://opensource.org/licenses/MIT
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
   termsOfService: http://swagger.io/terms/
   title: Jari API
   version: "1.0"

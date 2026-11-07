@@ -1,0 +1,191 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A newer push to the same ref supersedes the run still in flight.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+# Generator versions are pinned so drift checks are reproducible.
+# Keep in sync with go.mod (swag) and the versions documented in README.md.
+env:
+  MOCKERY_VERSION: v2.53.8
+  SWAG_VERSION: v1.16.6
+  GOLANGCI_LINT_VERSION: v2.15.0
+
+jobs:
+  go:
+    name: Go (vet, lint, test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: go vet
+        run: go vet ./...
+
+      # Built from source with the project's Go toolchain (install-mode: goinstall),
+      # so it can analyse code newer than a prebuilt binary's Go version.
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: ${{ env.GOLANGCI_LINT_VERSION }}
+          install-mode: goinstall
+
+      - name: go test
+        run: go test ./... -race -cover
+
+  generated:
+    name: Generated code (mocks, swagger)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install generators
+        run: |
+          go install github.com/vektra/mockery/v2@${MOCKERY_VERSION}
+          go install github.com/swaggo/swag/cmd/swag@${SWAG_VERSION}
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Regenerate mocks and swagger docs
+        run: |
+          make mock-gen
+          make swag
+
+      - name: Fail on drift
+        run: |
+          if ! git diff --exit-code; then
+            echo "::error::Generated files are out of date. Run 'make mock-gen' and 'make swag', then commit the result."
+            exit 1
+          fi
+
+  frontend:
+    name: Frontend (check, lint, test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Cache bun packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('frontend/bun.lock') }}
+          restore-keys: bun-${{ runner.os }}-
+
+      - run: bun install --frozen-lockfile
+
+      - name: Type check
+        run: bun run check
+
+      - name: Lint
+        run: bun run lint
+
+      # Component tests run in a real browser (vitest browser mode + playwright).
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+
+      - name: Unit and component tests
+        run: bun run test
+
+  build:
+    name: Build (binary, docker)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Cache bun packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('frontend/bun.lock') }}
+          restore-keys: bun-${{ runner.os }}-
+
+      # Builds the SPA, embeds it, and compiles the Go binary.
+      - name: make build
+        run: make build
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: docker build (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  migrations:
+    name: Migrations (up, down, up)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: jari
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d jari"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      ENV: development
+      DB_HOST: localhost
+      DB_PORT: "5432"
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_NAME: jari
+      DB_SSLMODE: disable
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build the binary once
+        run: go build -o jari ./cmd/api
+
+      - name: migrate up
+        run: ./jari migrate up
+
+      - name: migrate down (all)
+        run: ./jari migrate down all
+
+      - name: migrate up (again)
+        run: ./jari migrate up
+
+      - name: schema version
+        run: ./jari migrate version

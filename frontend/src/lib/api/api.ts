@@ -235,7 +235,7 @@ export class HttpClient<SecurityDataType = unknown> {
 /**
  * @title Jari API
  * @version 1.0
- * @license MIT (https://opensource.org/licenses/MIT)
+ * @license Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0)
  * @termsOfService http://swagger.io/terms/
  * @baseUrl //localhost:8080/api/v1
  * @contact API Support <support@swagger.io> (http://www.swagger.io/support)

@@ -61,6 +61,8 @@
 </script>
 
 {#if href}
+	<!-- href is supplied by callers (already resolve()d); this is a generic shadcn primitive. -->
+	<!-- eslint-disable svelte/no-navigation-without-resolve -->
 	<a
 		bind:this={ref}
 		data-slot="button"
@@ -73,6 +75,7 @@
 	>
 		{@render children?.()}
 	</a>
+	<!-- eslint-enable svelte/no-navigation-without-resolve -->
 {:else}
 	<button
 		bind:this={ref}

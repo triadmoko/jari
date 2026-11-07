@@ -1,5 +1,7 @@
 # Jari
 
+[![CI](https://github.com/triadmoko/jari/actions/workflows/ci.yml/badge.svg)](https://github.com/triadmoko/jari/actions/workflows/ci.yml)
+
 Jari adalah platform manajemen kerja dan proyek open-source yang meniru fitur inti Jira: proyek, work item, board, backlog dan sprint, workflow, pencarian (JQL), laporan, dan administrasi. "Jari" adalah **nama kerja** sampai nama produk final ditetapkan.
 
 Proyek ini masih dalam tahap awal (Sprint 0, remediasi baseline). Ruang lingkup, fase delivery, dan keputusan teknis ada di dokumen berikut:
@@ -125,6 +127,30 @@ Autentikasi memakai header `Authorization: Bearer <token>`.
 | `make web-dev` / `make web-build` | Frontend: dev server / build ke dalam binary |
 | `make build` | Build frontend lalu binary Go |
 
+## CI
+
+Workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) berjalan di setiap pull request dan push ke `main`. Job-nya paralel dan semuanya harus hijau sebelum merge:
+
+| Job | Isi |
+|-----|-----|
+| Go | `go vet`, `golangci-lint` ([`.golangci.yml`](.golangci.yml)), `go test ./... -race -cover` |
+| Generated code | `make mock-gen` dan `make swag` tidak boleh menghasilkan diff |
+| Frontend | `bun run check`, `bun run lint`, `bun run test` (vitest + Chromium) |
+| Build | `make build` (SPA ter-embed) dan `docker build` tanpa push |
+| Migrations | Postgres 15: `migrate up` → `down all` → `up` di database kosong |
+
+Versi generator dipin di bagian `env` workflow (`mockery`, `swag`, `golangci-lint`) agar pemeriksaan drift konsisten. Jalankan versi yang sama secara lokal sebelum membuka PR; kalau CI melaporkan drift, jalankan `make mock-gen` / `make swag` lalu commit hasilnya.
+
+Cache modul Go (`actions/setup-go`), paket bun, dan layer Docker (`type=gha`) dipakai ulang antar-run. **Target durasi pipeline: kurang dari 10 menit.** Durasi aktual tiap job terlihat di tab Actions; catat angka run pertama yang hijau di bawah ini.
+
+| Tanggal | Run | Total | Catatan |
+|---------|-----|-------|---------|
+| _belum diukur_ | | | Isi setelah PR pertama yang hijau |
+
 ## Lisensi
 
-Lisensi proyek dan nama final produk masih keputusan terbuka (lihat [PRD modul 00](docs/prd/00-visi-ruang-lingkup-glosarium-baseline.md)). Sampai ditetapkan, berkas ini belum menyertakan lisensi.
+Proyek ini berlisensi [Apache License 2.0](LICENSE). Nama final produk masih keputusan terbuka (lihat [PRD modul 00](docs/prd/00-visi-ruang-lingkup-glosarium-baseline.md)). Laporan lisensi dependensi ada di [`docs/licenses/`](docs/licenses/README.md) (`make licenses`, `make licenses-check`).
+
+## Identitas produk
+
+Nama produk hanya didefinisikan di satu tempat per stack: [`pkg/brand`](pkg/brand/brand.go) (backend, termasuk User-Agent untuk request keluar via `brand.NewTransport`) dan [`frontend/src/lib/brand.ts`](frontend/src/lib/brand.ts) (frontend). Aset logo/favicon placeholder ada di `frontend/src/lib/assets/logo.svg`. Anotasi Swagger di `cmd/api/main.go` dan label di `Dockerfile` berupa teks statis, jadi ikut diubah manual bila nama berubah. Jangan memakai nama, logo, atau aset produk pembanding di UI (VISI-001).

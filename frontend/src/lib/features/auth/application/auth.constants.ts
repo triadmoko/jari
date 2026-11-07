@@ -1,3 +1,5 @@
+import { PRODUCT_SLUG } from '#lib/brand.js';
+
 export const AUTH_ROUTES = {
 	login: '/auth/login',
 	register: '/auth/register',
@@ -11,7 +13,7 @@ export const GUEST_ONLY_PATHS = [AUTH_ROUTES.login, AUTH_ROUTES.register] as con
 /** Sliding window, same semantics as the old 12h cookie. */
 export const SESSION_TTL_MS = 12 * 60 * 60 * 1000;
 
-export const SESSION_STORAGE_KEY = 'jari_session';
+export const SESSION_STORAGE_KEY = `${PRODUCT_SLUG}_session`;
 
 /** Mirrors the backend rules in `dto_auth.RegisterRequest.Validate`. */
 export const AUTH_LIMITS = {

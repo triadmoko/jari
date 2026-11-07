@@ -34,7 +34,7 @@ func setupTest(t *testing.T) (*authUsecase, *mocks.MockUserRepository) {
 }
 
 func createTestContext() context.Context {
-	return context.WithValue(context.Background(), middleware.LangKey, constants.LangEN)
+	return context.WithValue(context.Background(), middleware.LangCtxKey, constants.LangEN)
 }
 
 func TestRegister_Success(t *testing.T) {

@@ -32,7 +32,7 @@ func setupTest(t *testing.T) (*userUsecase, *mocks.MockUserRepository) {
 }
 
 func createTestContext() context.Context {
-	return context.WithValue(context.Background(), middleware.LangKey, constants.LangEN)
+	return context.WithValue(context.Background(), middleware.LangCtxKey, constants.LangEN)
 }
 
 func TestGetProfile_Success(t *testing.T) {

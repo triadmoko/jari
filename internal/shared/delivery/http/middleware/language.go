@@ -7,7 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// LangKey is the key under which the language is stored in the gin context.
 const LangKey = "lang"
+
+// ctxKey is a dedicated type for context.Context keys so they cannot collide
+// with keys set by other packages (staticcheck SA1029).
+type ctxKey string
+
+// LangCtxKey is the key under which the language is stored in the request context.
+const LangCtxKey ctxKey = "lang"
 
 // LanguageMiddleware extracts language from Accept-Language header
 func LanguageMiddleware() gin.HandlerFunc {
@@ -26,7 +34,7 @@ func LanguageMiddleware() gin.HandlerFunc {
 		c.Set(LangKey, constants.Lang(lang))
 
 		// Set in request context
-		ctx := context.WithValue(c.Request.Context(), LangKey, constants.Lang(lang))
+		ctx := context.WithValue(c.Request.Context(), LangCtxKey, constants.Lang(lang))
 		c.Request = c.Request.WithContext(ctx)
 
 		c.Next()
@@ -35,7 +43,7 @@ func LanguageMiddleware() gin.HandlerFunc {
 
 // GetLangFromContext extracts language from context
 func GetLangFromContext(ctx context.Context) constants.Lang {
-	if lang, ok := ctx.Value(LangKey).(constants.Lang); ok {
+	if lang, ok := ctx.Value(LangCtxKey).(constants.Lang); ok {
 		return lang
 	}
 	return constants.LangEN

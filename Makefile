@@ -1,9 +1,9 @@
-include .env
+-include .env
 env:
 	 @echo $(MODE)
 
 dev:
-	sh -c 'set -a; . ./.env; set +a; gow run cmd/api/main.go'
+	sh -c 'set -a; . ./.env; set +a; gow run ./cmd/api'
 
 # Frontend (SPA, embedded into the Go binary from webui/dist)
 WEB_DIST=internal/shared/delivery/http/webui/dist
@@ -68,3 +68,19 @@ mock-gen:
 
 mock-clean:
 	rm -rf internal/mocks
+
+# Dependency license reports (docs/licenses/) and policy check.
+# The repo is Apache-2.0-licensed (see LICENSE): copyleft licenses (GPL, AGPL, LGPL, SSPL, ...) are not allowed.
+# Tool versions are pinned so the reports are reproducible.
+GO_LICENSES=go run github.com/google/go-licenses@v1.6.0
+WEB_LICENSES=bunx license-checker-rseidelsohn@4.4.2 --excludePrivatePackages
+# Licenses accepted in frontend dependencies (update docs/licenses/README.md when adding one)
+WEB_ALLOWED_LICENSES=MIT;MIT*;ISC;0BSD;BSD-2-Clause;BSD-3-Clause;Apache-2.0;MPL-2.0;OFL-1.1;Python-2.0;Unlicense;BlueOak-1.0.0;MIT OR Apache-2.0;(MIT OR CC0-1.0);(MPL-2.0 OR Apache-2.0)
+
+licenses:
+	$(GO_LICENSES) report ./cmd/api --ignore app > docs/licenses/go.csv
+	cd frontend && $(WEB_LICENSES) --csv > ../docs/licenses/frontend.csv
+
+licenses-check:
+	$(GO_LICENSES) check ./cmd/api --ignore app --disallowed_types=forbidden,restricted
+	cd frontend && $(WEB_LICENSES) --onlyAllow '$(WEB_ALLOWED_LICENSES)' --summary
