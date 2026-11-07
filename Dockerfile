@@ -1,5 +1,5 @@
 # Frontend build stage (SPA, static output in /web/build)
-FROM oven/bun:1.2-alpine AS web
+FROM oven/bun:1.4-alpine AS web
 
 WORKDIR /web
 

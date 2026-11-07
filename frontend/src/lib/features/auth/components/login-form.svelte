@@ -8,7 +8,8 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Spinner } from '#lib/components/ui/spinner/index.js';
 	import * as Field from '#lib/components/ui/field/index.js';
-	import { AUTH_MESSAGES, AUTH_ROUTES } from '../application/auth.constants.js';
+	import { i18n, t } from '#lib/i18n/index.js';
+	import { AUTH_ROUTES } from '../application/auth.constants.js';
 	import { login } from '../application/login.use-case.js';
 	import { postLoginTarget } from '../application/route-guard.js';
 	import { session } from '../application/session.svelte.js';
@@ -24,6 +25,12 @@
 	let submitting = $state(false);
 	let formError = $state<string | null>(null);
 	let fieldErrors = $state<FieldErrors>({});
+
+	$effect(() => {
+		void i18n.locale;
+		formError = null;
+		fieldErrors = {};
+	});
 
 	async function onsubmit(event: SubmitEvent) {
 		event.preventDefault();
@@ -51,14 +58,14 @@
 
 <Card.Root class="w-full max-w-sm">
 	<Card.Header>
-		<Card.Title>Masuk</Card.Title>
-		<Card.Description>Masuk dengan email dan kata sandi Anda.</Card.Description>
+		<Card.Title>{t('auth.login.title')}</Card.Title>
+		<Card.Description>{t('auth.login.description')}</Card.Description>
 	</Card.Header>
 	<Card.Content>
 		<form {onsubmit} novalidate class="flex flex-col gap-4">
 			{#if registered && !formError}
 				<Alert.Root role="status">
-					<Alert.Description>{AUTH_MESSAGES.registered}</Alert.Description>
+					<Alert.Description>{t('auth.registered')}</Alert.Description>
 				</Alert.Root>
 			{/if}
 			{#if formError}
@@ -70,7 +77,7 @@
 			<Field.Group>
 				<FormField
 					id="email"
-					label="Email"
+					label={t('field.email')}
 					type="email"
 					autocomplete="email"
 					bind:value={email}
@@ -79,7 +86,7 @@
 				/>
 				<FormField
 					id="password"
-					label="Kata sandi"
+					label={t('field.password')}
 					type="password"
 					autocomplete="current-password"
 					bind:value={password}
@@ -90,12 +97,14 @@
 
 			<Button type="submit" disabled={submitting}>
 				{#if submitting}<Spinner />{/if}
-				Masuk
+				{t('action.login')}
 			</Button>
 		</form>
 	</Card.Content>
 	<Card.Footer class="justify-center text-sm">
-		<span class="text-muted-foreground">Belum punya akun?&nbsp;</span>
-		<a href={resolve(AUTH_ROUTES.register)} class="underline underline-offset-4">Daftar</a>
+		<span class="text-muted-foreground">{t('auth.login.noAccount')}&nbsp;</span>
+		<a href={resolve(AUTH_ROUTES.register)} class="underline underline-offset-4">
+			{t('action.register')}
+		</a>
 	</Card.Footer>
 </Card.Root>

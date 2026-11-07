@@ -1,4 +1,10 @@
+import { t } from '#lib/i18n/index.js';
+
 export const PROFILE_MESSAGES = {
-	nameRequired: 'Nama wajib diisi.',
-	updated: 'Profil berhasil diperbarui.'
-} as const;
+	get nameRequired() {
+		return t('validation.required', { field: t('field.name') });
+	},
+	get updated() {
+		return t('profile.updated');
+	}
+};

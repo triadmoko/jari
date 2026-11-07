@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { pageTitle } from '#lib/brand.js';
+	import LocaleSwitcher from '#lib/components/locale-switcher.svelte';
+	import { t } from '#lib/i18n/index.js';
 	import LoginForm from '#lib/features/auth/components/login-form.svelte';
 	import { safeRedirectTarget } from '#lib/features/auth/index.js';
 
@@ -8,8 +10,9 @@
 	const registered = $derived(page.url.searchParams.get('registered') === '1');
 </script>
 
-<svelte:head><title>{pageTitle('Masuk')}</title></svelte:head>
+<svelte:head><title>{pageTitle(t('auth.login.title'))}</title></svelte:head>
 
-<main class="flex min-h-svh items-center justify-center p-6">
+<main class="relative flex min-h-svh items-center justify-center p-6">
+	<div class="absolute top-4 right-4"><LocaleSwitcher /></div>
 	<LoginForm {redirectTo} {registered} />
 </main>

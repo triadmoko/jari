@@ -1,5 +1,5 @@
-import { fail, type FieldErrors, type Result } from '#lib/api/result.js';
-import { API_ERROR_MESSAGES } from '#lib/api/result.js';
+import { API_ERROR_MESSAGES, fail, type FieldErrors, type Result } from '#lib/api/result.js';
+import { t } from '#lib/i18n/index.js';
 import type { AuthRepository, LoginInput, LoginOutput } from '../domain/auth.types.js';
 import { AUTH_MESSAGES } from './auth.constants.js';
 import { isValidEmail } from './validation.js';
@@ -7,10 +7,10 @@ import { isValidEmail } from './validation.js';
 export function validateLogin(input: LoginInput): FieldErrors {
 	const errors: FieldErrors = {};
 
-	if (!input.email.trim()) errors.email = [AUTH_MESSAGES.required('Email')];
+	if (!input.email.trim()) errors.email = [AUTH_MESSAGES.required(t('field.email'))];
 	else if (!isValidEmail(input.email)) errors.email = [AUTH_MESSAGES.invalidEmail];
 
-	if (!input.password) errors.password = [AUTH_MESSAGES.required('Kata sandi')];
+	if (!input.password) errors.password = [AUTH_MESSAGES.required(t('field.password'))];
 
 	return errors;
 }

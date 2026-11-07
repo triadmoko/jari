@@ -1,6 +1,7 @@
 import { goto } from '$app/navigation';
 import { AUTH_ROUTES } from '#lib/features/auth/application/auth.constants.js';
 import { session } from '#lib/features/auth/application/session.svelte.js';
+import { i18n } from '#lib/i18n/index.js';
 import { Api } from './api.js';
 
 /**
@@ -15,6 +16,7 @@ export const api = new Api({
 });
 
 api.instance.interceptors.request.use((config) => {
+	config.headers.set('Accept-Language', i18n.locale);
 	const token = session.token;
 	if (token) {
 		config.headers.set('Authorization', `Bearer ${token}`);

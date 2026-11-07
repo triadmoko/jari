@@ -6,6 +6,7 @@ vi.mock('$app/navigation', () => ({ goto }));
 
 import { AUTH_ROUTES } from '#lib/features/auth/application/auth.constants.js';
 import { session } from '#lib/features/auth/application/session.svelte.js';
+import { DEFAULT_LOCALE, i18n } from '#lib/i18n/index.js';
 import { api } from './client.js';
 
 function fakeStorage(): Storage {
@@ -57,6 +58,21 @@ describe('api client', () => {
 		await api.instance.get('/api/v1/users');
 
 		expect(seen[0].headers.get('Authorization')).toBe('Bearer jwt-123');
+	});
+
+	it('sends the UI language as Accept-Language so API messages follow it', async () => {
+		const seen = stubServer(200);
+
+		try {
+			await api.instance.get('/api/v1/users');
+			i18n.setLocale('en');
+			await api.instance.get('/api/v1/users');
+		} finally {
+			i18n.setLocale(DEFAULT_LOCALE);
+		}
+
+		expect(seen[0].headers.get('Accept-Language')).toBe('id');
+		expect(seen[1].headers.get('Accept-Language')).toBe('en');
 	});
 
 	it('sends no Authorization header without a session', async () => {

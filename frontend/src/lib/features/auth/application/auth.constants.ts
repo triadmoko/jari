@@ -1,4 +1,5 @@
 import { PRODUCT_SLUG } from '#lib/brand.js';
+import { t } from '#lib/i18n/index.js';
 
 export const AUTH_ROUTES = {
 	login: '/auth/login',
@@ -23,11 +24,23 @@ export const AUTH_LIMITS = {
 } as const;
 
 export const AUTH_MESSAGES = {
-	sessionExpired: 'Sesi Anda telah berakhir. Silakan masuk kembali.',
-	registered: 'Akun berhasil dibuat. Silakan masuk.',
-	required: (field: string) => `${field} wajib diisi.`,
-	invalidEmail: 'Format email tidak valid.',
-	usernameTooShort: `Username minimal ${AUTH_LIMITS.usernameMin} karakter.`,
-	usernameTooLong: `Username maksimal ${AUTH_LIMITS.usernameMax} karakter.`,
-	passwordTooShort: `Kata sandi minimal ${AUTH_LIMITS.passwordMin} karakter.`
-} as const;
+	get sessionExpired() {
+		return t('auth.sessionExpired');
+	},
+	get registered() {
+		return t('auth.registered');
+	},
+	required: (field: string) => t('validation.required', { field }),
+	get invalidEmail() {
+		return t('validation.invalidEmail');
+	},
+	get usernameTooShort() {
+		return t('validation.usernameTooShort', { min: AUTH_LIMITS.usernameMin });
+	},
+	get usernameTooLong() {
+		return t('validation.usernameTooLong', { max: AUTH_LIMITS.usernameMax });
+	},
+	get passwordTooShort() {
+		return t('validation.passwordTooShort', { min: AUTH_LIMITS.passwordMin });
+	}
+};

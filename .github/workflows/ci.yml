@@ -2,8 +2,6 @@ name: CI
 
 on:
   pull_request:
-  push:
-    branches: [main]
 
 # A newer push to the same ref supersedes the run still in flight.
 concurrency:
@@ -16,7 +14,7 @@ permissions:
 # Generator versions are pinned so drift checks are reproducible.
 # Keep in sync with go.mod (swag) and the versions documented in README.md.
 env:
-  MOCKERY_VERSION: v2.53.8
+  MOCK_GENERATOR_VERSION: v2.53.8
   SWAG_VERSION: v1.16.6
   GOLANGCI_LINT_VERSION: v2.15.0
 
@@ -59,7 +57,7 @@ jobs:
 
       - name: Install generators
         run: |
-          go install github.com/vektra/mockery/v2@${MOCKERY_VERSION}
+          go install github.com/vektra/mockery/v2@${MOCK_GENERATOR_VERSION}
           go install github.com/swaggo/swag/cmd/swag@${SWAG_VERSION}
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 

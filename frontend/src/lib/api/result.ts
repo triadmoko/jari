@@ -1,4 +1,5 @@
 import { isAxiosError } from 'axios';
+import { t } from '#lib/i18n/index.js';
 
 export type ApiErrorCode =
 	'UNAUTHORIZED' | 'FORBIDDEN' | 'INVALID_CREDENTIALS' | 'VALIDATION_ERROR' | 'UNKNOWN_ERROR';
@@ -15,14 +16,27 @@ export type Failure = {
 
 export type Result<T> = { ok: true; value: T } | Failure;
 
+/** Getters, not constants: each read resolves against the language selected at that moment. */
 export const API_ERROR_MESSAGES = {
-	validation: 'Periksa kembali isian Anda.',
-	unauthorized: 'Sesi Anda tidak valid. Silakan masuk kembali.',
-	invalidCredentials: 'Email atau kata sandi salah.',
-	forbidden: 'Anda tidak memiliki akses untuk tindakan ini.',
-	network: 'Tidak dapat terhubung ke server. Coba lagi beberapa saat.',
-	unknown: 'Terjadi kesalahan. Coba lagi beberapa saat.'
-} as const;
+	get validation() {
+		return t('api.validation');
+	},
+	get unauthorized() {
+		return t('api.unauthorized');
+	},
+	get invalidCredentials() {
+		return t('api.invalidCredentials');
+	},
+	get forbidden() {
+		return t('api.forbidden');
+	},
+	get network() {
+		return t('api.network');
+	},
+	get unknown() {
+		return t('api.unknown');
+	}
+};
 
 export function ok<T>(value: T): Result<T> {
 	return { ok: true, value };

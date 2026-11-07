@@ -9,6 +9,7 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import * as Field from '#lib/components/ui/field/index.js';
 	import { Spinner } from '#lib/components/ui/spinner/index.js';
+	import { i18n, t } from '#lib/i18n/index.js';
 	import { AUTH_ROUTES } from '../application/auth.constants.js';
 	import { register } from '../application/register.use-case.js';
 	import { apiAuthRepository } from '../infrastructure/api-auth.client.js';
@@ -20,6 +21,12 @@
 	let submitting = $state(false);
 	let formError = $state<string | null>(null);
 	let fieldErrors = $state<FieldErrors>({});
+
+	$effect(() => {
+		void i18n.locale;
+		formError = null;
+		fieldErrors = {};
+	});
 
 	async function onsubmit(event: SubmitEvent) {
 		event.preventDefault();
@@ -46,8 +53,10 @@
 
 <Card.Root class="w-full max-w-sm">
 	<Card.Header>
-		<Card.Title>Daftar</Card.Title>
-		<Card.Description>Buat akun baru untuk mulai memakai {PRODUCT_NAME}.</Card.Description>
+		<Card.Title>{t('auth.register.title')}</Card.Title>
+		<Card.Description>
+			{t('auth.register.description', { product: PRODUCT_NAME })}
+		</Card.Description>
 	</Card.Header>
 	<Card.Content>
 		<form {onsubmit} novalidate class="flex flex-col gap-4">
@@ -60,7 +69,7 @@
 			<Field.Group>
 				<FormField
 					id="name"
-					label="Nama"
+					label={t('field.name')}
 					autocomplete="name"
 					bind:value={name}
 					errors={fieldErrors.name}
@@ -68,7 +77,7 @@
 				/>
 				<FormField
 					id="username"
-					label="Username"
+					label={t('field.username')}
 					autocomplete="username"
 					bind:value={username}
 					errors={fieldErrors.username}
@@ -76,7 +85,7 @@
 				/>
 				<FormField
 					id="email"
-					label="Email"
+					label={t('field.email')}
 					type="email"
 					autocomplete="email"
 					bind:value={email}
@@ -85,7 +94,7 @@
 				/>
 				<FormField
 					id="password"
-					label="Kata sandi"
+					label={t('field.password')}
 					type="password"
 					autocomplete="new-password"
 					bind:value={password}
@@ -96,12 +105,14 @@
 
 			<Button type="submit" disabled={submitting}>
 				{#if submitting}<Spinner />{/if}
-				Daftar
+				{t('action.register')}
 			</Button>
 		</form>
 	</Card.Content>
 	<Card.Footer class="justify-center text-sm">
-		<span class="text-muted-foreground">Sudah punya akun?&nbsp;</span>
-		<a href={resolve(AUTH_ROUTES.login)} class="underline underline-offset-4">Masuk</a>
+		<span class="text-muted-foreground">{t('auth.register.haveAccount')}&nbsp;</span>
+		<a href={resolve(AUTH_ROUTES.login)} class="underline underline-offset-4">
+			{t('action.login')}
+		</a>
 	</Card.Footer>
 </Card.Root>

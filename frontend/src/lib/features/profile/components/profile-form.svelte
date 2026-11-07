@@ -10,7 +10,7 @@
 	import { Skeleton } from '#lib/components/ui/skeleton/index.js';
 	import { Spinner } from '#lib/components/ui/spinner/index.js';
 	import { session } from '#lib/features/auth/index.js';
-	import { PROFILE_MESSAGES } from '../application/profile.constants.js';
+	import { i18n, t } from '#lib/i18n/index.js';
 	import { updateProfileName } from '../application/update-profile.use-case.js';
 	import type { Profile } from '../domain/profile.types.js';
 	import { apiProfileRepository } from '../infrastructure/api-profile.client.js';
@@ -22,6 +22,12 @@
 	let loadError = $state<string | null>(null);
 	let formError = $state<string | null>(null);
 	let fieldErrors = $state<FieldErrors>({});
+
+	$effect(() => {
+		void i18n.locale;
+		formError = null;
+		fieldErrors = {};
+	});
 
 	onMount(async () => {
 		const result = await apiProfileRepository.get();
@@ -54,14 +60,14 @@
 		profile = result.value;
 		name = result.value.name;
 		if (session.user) session.updateUser({ ...session.user, name: result.value.name });
-		toast.success(PROFILE_MESSAGES.updated);
+		toast.success(t('profile.updated'));
 	}
 </script>
 
 <Card.Root class="w-full max-w-md">
 	<Card.Header>
-		<Card.Title>Profil</Card.Title>
-		<Card.Description>Lihat dan ubah nama tampilan Anda.</Card.Description>
+		<Card.Title>{t('profile.title')}</Card.Title>
+		<Card.Description>{t('profile.description')}</Card.Description>
 	</Card.Header>
 	<Card.Content>
 		{#if loading}
@@ -83,11 +89,11 @@
 				{/if}
 
 				<Field.Group>
-					<FormField id="email" label="Email" value={profile.email} readonly />
-					<FormField id="username" label="Username" value={profile.username} readonly />
+					<FormField id="email" label={t('field.email')} value={profile.email} readonly />
+					<FormField id="username" label={t('field.username')} value={profile.username} readonly />
 					<FormField
 						id="name"
-						label="Nama"
+						label={t('field.name')}
 						autocomplete="name"
 						bind:value={name}
 						errors={fieldErrors.name}
@@ -97,7 +103,7 @@
 
 				<Button type="submit" disabled={submitting}>
 					{#if submitting}<Spinner />{/if}
-					Simpan
+					{t('action.save')}
 				</Button>
 			</form>
 		{/if}
