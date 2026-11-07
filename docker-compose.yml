@@ -1,55 +1,82 @@
 version: "3.8"
 
+# Database settings shared by the migration job and the API server
+x-db-env: &db-env
+  DB_HOST: postgres
+  DB_PORT: "5432"
+  DB_USER: postgres
+  DB_PASS: password
+  DB_NAME: jari
+  DB_SSLMODE: disable
+
 services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: yopatungan-postgres
+    container_name: jari-postgres
     environment:
-      POSTGRES_DB: yopatungan
+      POSTGRES_DB: jari
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d jari"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
-      - yopatungan-network
+      - jari-network
 
   # Redis (for caching, optional)
   redis:
     image: redis:7-alpine
-    container_name: yopatungan-redis
+    container_name: jari-redis
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
     networks:
-      - yopatungan-network
+      - jari-network
 
-  # Application
+  # One-shot job: apply the migrations embedded in the binary, then exit
+  migrate:
+    build: .
+    image: jari-app
+    command: ["./main", "migrate", "up"]
+    environment:
+      <<: *db-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - jari-network
+
+  # Application (refuses to start if the schema is not fully migrated)
   app:
     build: .
+    image: jari-app
     container_name: app
     ports:
       - "8080:8080"
     environment:
-      - SERVER_PORT=8080
-      - SERVER_HOST=0.0.0.0
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=password
-      - DB_NAME=yopatungan
-      - DB_SSLMODE=disable
-      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-      - ENV=production
+      <<: *db-env
+      SERVER_PORT: "8080"
+      SERVER_HOST: 0.0.0.0
+      JWT_SECRET: your-super-secret-jwt-key-change-this-in-production
+      ENV: production
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
     networks:
-      - yopatungan-network
+      - jari-network
     restart: unless-stopped
 
 volumes:
@@ -57,5 +84,5 @@ volumes:
   redis_data:
 
 networks:
-  yopatungan-network:
+  jari-network:
     driver: bridge

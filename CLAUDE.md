@@ -13,7 +13,7 @@ make test-coverage-report         # Display coverage in terminal
 
 # Database Migrations
 make migration-up                 # Run all pending migrations
-make migration-down               # Rollback last migration
+make migration-down               # Rollback last migration (n=N or n=all for more)
 make migration-create name=xxx    # Create new migration file
 make migration-force version=N    # Force migration to specific version
 make migration-version            # Show current migration version
@@ -138,6 +138,13 @@ Language is detected from `Accept-Language` header by `middleware.LanguageMiddle
 - UI uses Scalar (`internal/shared/delivery/http/apidocs`), loaded from CDN; spec served from `swag` at `/swagger/doc.json`
 - Access at `http://localhost:8080/swagger/index.html`
 - Use `@Security BearerAuth` annotation for protected endpoints
+
+### Database Migrations
+
+- SQL files live in `migrations/` (golang-migrate naming `NNN_name.up.sql` / `.down.sql`) and are embedded via `migrations.FS`.
+- Applied by the binary's subcommand `./main migrate up | down [N|all] | version | force V` (`internal/shared/infrastructure/database/migrator`); the `make migration-*` targets wrap it with `go run`, only `migration-create` needs the `migrate` CLI.
+- `app.New()` calls `migrator.CheckSchema` and refuses to start when the schema is pending, dirty, or newer than the binary.
+- Docker Compose runs a one-shot `migrate` service before `app`; never mount `migrations/` into Postgres `docker-entrypoint-initdb.d` (it would also run `*.down.sql`).
 
 ### Configuration
 

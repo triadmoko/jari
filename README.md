@@ -30,7 +30,7 @@ A production-ready Go REST API template with Clean Architecture and feature-base
 
 - Go 1.26+
 - PostgreSQL 15+
-- [golang-migrate](https://github.com/golang-migrate/migrate) CLI
+- [golang-migrate](https://github.com/golang-migrate/migrate) CLI (only for `make migration-create`)
 - Docker & Docker Compose (optional)
 - [gow](https://github.com/mitranim/gow) for hot-reload in development (optional)
 
@@ -106,7 +106,7 @@ The API will be available at `http://localhost:8080`.
 │   ├── jwt/                  # JWT utilities
 │   ├── crypto/               # Password hashing
 │   └── logger/               # Structured logging
-├── migration/                # SQL migration files
+├── migrations/               # SQL migration files (embedded into the binary)
 └── docs/                     # Swagger documentation
 ```
 
@@ -116,7 +116,7 @@ The API will be available at `http://localhost:8080`.
 |---------|-------------|
 | `make dev` | Run with hot-reload (requires gow) |
 | `make migration-up` | Run all pending migrations |
-| `make migration-down` | Rollback last migration |
+| `make migration-down [n=N\|all]` | Rollback last migration (or N / all) |
 | `make migration-create name=xxx` | Create a new migration |
 | `make migration-force version=N` | Force migration version |
 | `make migration-version` | Show current migration version |

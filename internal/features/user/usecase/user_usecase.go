@@ -16,7 +16,7 @@ import (
 
 // UserUsecase defines the interface for user use cases
 type UserUsecase interface {
-	GetProfile(ctx context.Context, userID string) (*dto_user	.UserResponse, int, error)
+	GetProfile(ctx context.Context, userID string) (*dto_user.UserResponse, int, error)
 	UpdateProfile(ctx context.Context, userID string, req *dto_user.UpdateProfileRequest) (*dto_user.UserResponse, int, error)
 	GetUsers(ctx context.Context, queries map[string]string) ([]*dto_user.UserResponse, pkg.PaginationResponse, int, error)
 }
@@ -87,28 +87,21 @@ func (u *userUsecase) GetUsers(ctx context.Context, queries map[string]string) (
 	pagination := pkg.PaginationBuilder(queries["per_page"], queries["page"])
 
 	// Parse array filters
-	var genders, roles []string
-	if queries["genders"] != "" {
-		genders = strings.Split(queries["genders"], ",")
-	}
+	var roles []string
 	if queries["roles"] != "" {
 		roles = strings.Split(queries["roles"], ",")
 	}
 
 	// Build filter
 	filter := entity.FilterUser{
-		ID:        queries["id"],
-		Email:     queries["email"],
-		Username:  queries["username"],
-		Name:      queries["name"],
-		Status:    queries["status"],
-		Gender:    queries["gender"],
-		Role:      queries["role"],
-		Provider:  queries["provider"],
-		Genders:   genders,
-		Roles:     roles,
-		PerPage:   pagination.PerPage,
-		Offset:    pagination.Offset,
+		ID:       queries["id"],
+		Email:    queries["email"],
+		Username: queries["username"],
+		Name:     queries["name"],
+		Role:     queries["role"],
+		Roles:    roles,
+		PerPage:  pagination.PerPage,
+		Offset:   pagination.Offset,
 	}
 
 	// Get users from repository
@@ -119,7 +112,7 @@ func (u *userUsecase) GetUsers(ctx context.Context, queries map[string]string) (
 	}
 
 	// Convert entity users to DTO response
-		userResponses := make([]*dto_user.UserResponse, 0, len(users))
+	userResponses := make([]*dto_user.UserResponse, 0, len(users))
 	for _, user := range users {
 		userResponses = append(userResponses, dto_user.ToUserResponse(user))
 	}

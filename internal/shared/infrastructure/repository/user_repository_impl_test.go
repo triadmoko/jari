@@ -19,11 +19,11 @@ import (
 
 type UserRepositoryTestSuite struct {
 	suite.Suite
-	db      *gorm.DB
-	mock    sqlmock.Sqlmock
-	repo    *userRepository
-	ctx     context.Context
-	sqlDB   *sql.DB
+	db    *gorm.DB
+	mock  sqlmock.Sqlmock
+	repo  *userRepository
+	ctx   context.Context
+	sqlDB *sql.DB
 }
 
 func (s *UserRepositoryTestSuite) SetupTest() {
@@ -65,19 +65,14 @@ func (s *UserRepositoryTestSuite) TestCreate_Success() {
 
 	s.mock.ExpectBegin()
 	s.mock.ExpectExec(regexp.QuoteMeta(
-		`INSERT INTO "users" ("id","email","username","password","name","phone","status","birth_date","gender","role","provider","is_active","created_at","updated_at","deleted_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`)).
+		`INSERT INTO "users" ("id","email","username","password","name","role","is_active","created_at","updated_at","deleted_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`)).
 		WithArgs(
 			user.ID,
 			user.Email,
 			user.Username,
 			user.Password,
 			user.Name,
-			nil,      // phone
-			"active", // status (default value)
-			nil,      // birth_date
-			"",       // gender
-			"user",   // role (default value)
-			"",       // provider
+			"user", // role (default value)
 			user.IsActive,
 			sqlmock.AnyArg(),
 			sqlmock.AnyArg(),
@@ -218,12 +213,12 @@ func (s *UserRepositoryTestSuite) TestGetByUsername_NotFound() {
 
 func (s *UserRepositoryTestSuite) TestUpdate_Success() {
 	user := &entity.User{
-		ID:        "user-123",
-		Email:     "test@example.com",
-		Username:  "testuser",
-		Password:  "hashedpassword",
-		Name: "Updated User",
-		IsActive:  true,
+		ID:       "user-123",
+		Email:    "test@example.com",
+		Username: "testuser",
+		Password: "hashedpassword",
+		Name:     "Updated User",
+		IsActive: true,
 	}
 
 	filter := entity.FilterUser{
@@ -243,12 +238,12 @@ func (s *UserRepositoryTestSuite) TestUpdate_Success() {
 
 func (s *UserRepositoryTestSuite) TestUpdate_Error() {
 	user := &entity.User{
-		ID:        "user-123",
-		Email:     "test@example.com",
-		Username:  "testuser",
-		Password:  "hashedpassword",
-		Name: "Updated User",
-		IsActive:  true,
+		ID:       "user-123",
+		Email:    "test@example.com",
+		Username: "testuser",
+		Password: "hashedpassword",
+		Name:     "Updated User",
+		IsActive: true,
 	}
 
 	filter := entity.FilterUser{

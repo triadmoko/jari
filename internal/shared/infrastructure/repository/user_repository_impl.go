@@ -111,44 +111,13 @@ func (r *userRepository) List(ctx context.Context, filter entity.FilterUser) ([]
 		})
 	}
 
-	// Extended filters (add these columns to your User entity if needed)
-	if filter.Phone != nil {
-		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("phone = ?", *filter.Phone)
-		})
-	}
-	if filter.Status != "" {
-		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("status = ?", filter.Status)
-		})
-	}
-	if filter.BirthDate != nil {
-		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("birth_date = ?", filter.BirthDate)
-		})
-	}
-	if filter.Gender != "" {
-		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("gender = ?", filter.Gender)
-		})
-	}
 	if filter.Role != "" {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
 			return db.Where("role = ?", filter.Role)
 		})
 	}
-	if filter.Provider != "" {
-		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("provider = ?", filter.Provider)
-		})
-	}
 
 	// Array filters for IN queries
-	if len(filter.Genders) > 0 {
-		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
-			return db.Where("gender IN ?", filter.Genders)
-		})
-	}
 	if len(filter.Roles) > 0 {
 		scopes = append(scopes, func(db *gorm.DB) *gorm.DB {
 			return db.Where("role IN ?", filter.Roles)

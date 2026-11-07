@@ -130,11 +130,7 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 //	@Param			email		query		string	false	"Filter by email"
 //	@Param			username	query		string	false	"Filter by username"
 //	@Param			name		query		string	false	"Filter by name (LIKE search)"
-//	@Param			status		query		string	false	"Filter by status"
-//	@Param			gender		query		string	false	"Filter by gender"
 //	@Param			role		query		string	false	"Filter by role"
-//	@Param			provider	query		string	false	"Filter by provider"
-//	@Param			genders		query		string	false	"Filter by multiple genders (comma-separated)"
 //	@Param			roles		query		string	false	"Filter by multiple roles (comma-separated)"
 //	@Success		200			{object}	response.Response{data=dto_user.UserListResponse}
 //	@Failure		400			{object}	response.Response

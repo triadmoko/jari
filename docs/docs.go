@@ -199,44 +199,14 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Filter by first name (LIKE search)",
-                        "name": "first_name",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by last name (LIKE search)",
-                        "name": "last_name",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by status",
-                        "name": "status",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by gender",
-                        "name": "gender",
+                        "description": "Filter by name (LIKE search)",
+                        "name": "name",
                         "in": "query"
                     },
                     {
                         "type": "string",
                         "description": "Filter by role",
                         "name": "role",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by provider",
-                        "name": "provider",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by multiple genders (comma-separated)",
-                        "name": "genders",
                         "in": "query"
                     },
                     {
@@ -447,10 +417,7 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
+                "name": {
                     "type": "string"
                 },
                 "password": {
@@ -470,22 +437,16 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "first_name": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 },
                 "is_active": {
                     "type": "boolean"
                 },
-                "last_name": {
+                "name": {
                     "type": "string"
                 },
                 "role": {
-                    "type": "string"
-                },
-                "status": {
                     "type": "string"
                 },
                 "username": {
@@ -496,10 +457,7 @@ const docTemplate = `{
         "dto_user.UpdateProfileRequest": {
             "type": "object",
             "properties": {
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
+                "name": {
                     "type": "string"
                 }
             }
@@ -521,19 +479,10 @@ const docTemplate = `{
         "dto_user.UserResponse": {
             "type": "object",
             "properties": {
-                "birth_date": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
                 },
                 "email": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "gender": {
                     "type": "string"
                 },
                 "id": {
@@ -542,19 +491,10 @@ const docTemplate = `{
                 "is_active": {
                     "type": "boolean"
                 },
-                "last_name": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "provider": {
+                "name": {
                     "type": "string"
                 },
                 "role": {
-                    "type": "string"
-                },
-                "status": {
                     "type": "string"
                 },
                 "updated_at": {

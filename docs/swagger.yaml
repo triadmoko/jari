@@ -18,9 +18,7 @@ definitions:
     properties:
       email:
         type: string
-      first_name:
-        type: string
-      last_name:
+      name:
         type: string
       password:
         type: string
@@ -33,26 +31,20 @@ definitions:
         type: string
       email:
         type: string
-      first_name:
-        type: string
       id:
         type: string
       is_active:
         type: boolean
-      last_name:
+      name:
         type: string
       role:
-        type: string
-      status:
         type: string
       username:
         type: string
     type: object
   dto_user.UpdateProfileRequest:
     properties:
-      first_name:
-        type: string
-      last_name:
+      name:
         type: string
     type: object
   dto_user.UserListResponse:
@@ -66,29 +58,17 @@ definitions:
     type: object
   dto_user.UserResponse:
     properties:
-      birth_date:
-        type: string
       created_at:
         type: string
       email:
-        type: string
-      first_name:
-        type: string
-      gender:
         type: string
       id:
         type: string
       is_active:
         type: boolean
-      last_name:
-        type: string
-      phone:
-        type: string
-      provider:
+      name:
         type: string
       role:
-        type: string
-      status:
         type: string
       updated_at:
         type: string
@@ -234,33 +214,13 @@ paths:
         in: query
         name: username
         type: string
-      - description: Filter by first name (LIKE search)
+      - description: Filter by name (LIKE search)
         in: query
-        name: first_name
-        type: string
-      - description: Filter by last name (LIKE search)
-        in: query
-        name: last_name
-        type: string
-      - description: Filter by status
-        in: query
-        name: status
-        type: string
-      - description: Filter by gender
-        in: query
-        name: gender
+        name: name
         type: string
       - description: Filter by role
         in: query
         name: role
-        type: string
-      - description: Filter by provider
-        in: query
-        name: provider
-        type: string
-      - description: Filter by multiple genders (comma-separated)
-        in: query
-        name: genders
         type: string
       - description: Filter by multiple roles (comma-separated)
         in: query

@@ -9,10 +9,10 @@ import (
 
 // RegisterRequest represents the request for user registration
 type RegisterRequest struct {
-	Email     string `json:"email"`
-	Username  string `json:"username"`
-	Password  string `json:"password"`
-	Name      string `json:"name"`
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Name     string `json:"name"`
 }
 
 // Validate validates RegisterRequest fields
@@ -84,7 +84,6 @@ type RegisterResponse struct {
 	Email     string    `json:"email"`
 	Username  string    `json:"username"`
 	Name      string    `json:"name"`
-	Status    string    `json:"status"`
 	Role      string    `json:"role"`
 	IsActive  bool      `json:"is_active"`
 	CreatedAt time.Time `json:"created_at"`
@@ -97,7 +96,6 @@ func ToRegisterResponse(user *entity.User) *RegisterResponse {
 		Email:     user.Email,
 		Username:  user.Username,
 		Name:      user.Name,
-		Status:    user.Status,
 		Role:      user.Role,
 		IsActive:  user.IsActive,
 		CreatedAt: user.CreatedAt,

@@ -7,7 +7,9 @@ import (
 	"app/internal/shared/delivery/http/middleware"
 	"app/internal/shared/delivery/http/webui"
 	"app/internal/shared/infrastructure/database"
+	"app/internal/shared/infrastructure/database/migrator"
 	sharedRepo "app/internal/shared/infrastructure/repository"
+	"app/migrations"
 	"app/pkg/logger"
 
 	"github.com/gin-gonic/gin"
@@ -42,6 +44,17 @@ func New() (*App, error) {
 		return nil, err
 	}
 	app.DB = db
+
+	// Refuse to start when the schema does not match the embedded migrations
+	sqlDB, err := db.GetDB().DB()
+	if err != nil {
+		db.Close()
+		return nil, err
+	}
+	if err := migrator.CheckSchema(sqlDB, migrations.FS); err != nil {
+		db.Close()
+		return nil, err
+	}
 
 	// Setup router with features
 	app.Engine = app.setupRouter()

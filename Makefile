@@ -22,22 +22,26 @@ web-build: web-install
 build: web-build
 	CGO_ENABLED=0 go build -o main ./cmd/api
 
-url=postgres://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)
+# Migrations: SQL files in ./migrations are embedded into the binary and applied
+# by its `migrate` subcommand (same DB config as the server, loaded from .env).
+MIGRATE=sh -c 'set -a; . ./.env; set +a; exec go run ./cmd/api migrate "$$@"' migrate
 
 migration-up:
-	migrate -database "$(url)" -path ./migration/ up $(version)
-	
+	$(MIGRATE) up
+
+# n=N rolls back N migrations (default 1), n=all rolls back everything
 migration-down:
-	migrate -database "$(url)" -path ./migration/ down $(version)
-	
+	$(MIGRATE) down $(n)
+
 migration-create:
-	migrate create -ext sql -dir ./migration/ -seq $(name)
+	migrate create -ext sql -dir ./migrations -seq $(name)
 
 migration-force:
-	migrate -database "$(url)" -path ./migration/ force $(version)
+	$(MIGRATE) force $(version)
 
 migration-version:
-	migrate -database "$(url)" -path ./migration/ version
+	$(MIGRATE) version
+
 swag:
 	swag init --parseInternal -g cmd/api/main.go --output ./docs
 

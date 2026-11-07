@@ -29,12 +29,7 @@ type UserResponse struct {
 	Email     string    `json:"email"`
 	Username  string    `json:"username"`
 	Name      string    `json:"name"`
-	Phone     *string   `json:"phone,omitempty"`
-	Status    string    `json:"status"`
-	BirthDate *string   `json:"birth_date,omitempty"`
-	Gender    string    `json:"gender,omitempty"`
 	Role      string    `json:"role"`
-	Provider  string    `json:"provider,omitempty"`
 	IsActive  bool      `json:"is_active"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -46,28 +41,16 @@ func ToUserResponse(user *entity.User) *UserResponse {
 		return nil
 	}
 
-	response := &UserResponse{
+	return &UserResponse{
 		ID:        user.ID,
 		Email:     user.Email,
 		Username:  user.Username,
 		Name:      user.Name,
-		Phone:     user.Phone,
-		Status:    user.Status,
-		Gender:    user.Gender,
 		Role:      user.Role,
-		Provider:  user.Provider,
 		IsActive:  user.IsActive,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	}
-
-	// Format birth date if exists
-	if user.BirthDate != nil {
-		birthDate := user.BirthDate.Format("2006-01-02")
-		response.BirthDate = &birthDate
-	}
-
-	return response
 }
 
 // UserListResponse represents the response for listing users with pagination

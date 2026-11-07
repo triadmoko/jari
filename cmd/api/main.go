@@ -33,6 +33,14 @@ import (
 //	@description				Type "Bearer" followed by a space and JWT token.
 
 func main() {
+	// Subcommand: `main migrate <up|down [N|all]|version|force V>`
+	if len(os.Args) > 1 && os.Args[1] == "migrate" {
+		if err := runMigrate(os.Args[2:]); err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
+
 	// Initialize application
 	application, err := app.New()
 	if err != nil {
