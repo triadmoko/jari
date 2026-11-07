@@ -1,4 +1,4 @@
-# PRD — Platform Pelacak Kerja, Layanan & Discovery (nama kerja `jari`)
+# PRD — Platform Pelacak Kerja, Layanan & Discovery (`jari`)
 
 Dokumen ini adalah indeks dan ringkasan eksekutif Product Requirements Document (PRD) untuk produk clone yang setara fungsional dengan Jira Cloud: Jira terpadu (eks Jira Software dan Jira Work Management, semua plan), Jira Service Management, dan Jira Product Discovery. Produk dibangun di repo ini: backend Go (Clean Architecture, Gin, GORM, PostgreSQL) dengan SPA SvelteKit 5 yang di-embed ke satu binary. Saat PRD ditulis, repo baru memiliki fitur auth dan user.
 
@@ -70,7 +70,7 @@ Produk ini adalah **pelacak kerja open-source dan self-hosted dengan cakupan set
 - **Sederhana dioperasikan.** Dependensi minimumnya hanya satu binary Go dan PostgreSQL. Cache, queue, object storage, dan search engine bersifat opsional.
 - **Terbuka & dapat diperluas.** Tersedia REST API publik, webhook, dan titik ekstensi sendiri, tanpa keterikatan pada ekosistem Marketplace.
 
-**Catatan penamaan.** Produk ini **belum memiliki nama final**. Seluruh PRD menyebutnya "produk ini" atau "clone", sedangkan `jari` hanya nama kerja repo. Nama dan merek Atlassian (Jira, Confluence, Opsgenie, Rovo, dan lainnya) tidak dipakai sebagai nama produk, logo, nama fitur di UI, maupun identitas visual. Merek tersebut hanya disebut secara nominatif dan deskriptif, misalnya untuk menjelaskan acuan paritas, kompatibilitas format/API, atau importer. Istilah generik metodologi (work item, Epic, Sprint, Backlog, Board, Workflow, Request type, SLA, dan sebagainya) dipakai apa adanya. Aturan rinci ada di `VISI-001 Product Naming & Trademark Compliance` dan `VISI-002 Terminology Update` di [modul 00](00-visi-ruang-lingkup-glosarium-baseline.md). Jira dan Atlassian adalah merek dagang Atlassian Pty Ltd. Produk ini tidak berafiliasi dengan Atlassian.
+**Catatan penamaan.** Nama final produk ini adalah **Jari**. Seluruh PRD menyebutnya "produk ini" atau "clone". Nama dan merek Atlassian (Jira, Confluence, Opsgenie, Rovo, dan lainnya) tidak dipakai sebagai nama produk, logo, nama fitur di UI, maupun identitas visual. Merek tersebut hanya disebut secara nominatif dan deskriptif, misalnya untuk menjelaskan acuan paritas, kompatibilitas format/API, atau importer. Istilah generik metodologi (work item, Epic, Sprint, Backlog, Board, Workflow, Request type, SLA, dan sebagainya) dipakai apa adanya. Aturan rinci ada di `VISI-001 Product Naming & Trademark Compliance` dan `VISI-002 Terminology Update` di [modul 00](00-visi-ruang-lingkup-glosarium-baseline.md). Jira dan Atlassian adalah merek dagang Atlassian Pty Ltd. Produk ini tidak berafiliasi dengan Atlassian.
 
 ## Persona
 
@@ -282,8 +282,8 @@ Pertanyaan outline "apakah Service Management dan Product Discovery di luar caku
 
 ### A. Identitas produk, merek & terminologi
 
-1. **Nama final produk** dan perlu tidaknya pendaftaran merek (mis. di DJKI) sebelum rilis publik. Nama ini juga dipakai untuk prefix subject email, header From, aktor otomasi, perintah slash, dan konektor chat. (O; M00; M19 NTF-018, NTF-024, NTF-037; M25)
-2. **Lisensi open-source** proyek (MIT, Apache-2.0, AGPL-3.0). Pilihan ini menentukan daftar tolak lisensi dependensi. (M00 VISI-001)
+1. **Pendaftaran merek "Jari"** (mis. di DJKI) sebelum rilis publik; nama final sudah ditetapkan: Jari. Nama ini juga dipakai untuk prefix subject email, header From, aktor otomasi, perintah slash, dan konektor chat. (O; M00; M19 NTF-018, NTF-024, NTF-037; M25)
+2. ~~**Lisensi open-source** proyek~~ Sudah diputuskan: **Apache-2.0** (berkas `LICENSE`). Daftar tolak lisensi dependensi: copyleft kuat (GPL, AGPL, LGPL, SSPL), lihat `docs/licenses/README.md`. (M00 VISI-001)
 3. **Nama bahasa kueri di UI**, dan apakah akronim "JQL" boleh tampil di UI. (M00)
 4. **Label UI**: "Issue" atau "Work item", "Project" atau "Space" (di UI Indonesia "Proyek" atau "Ruang"). Juga set terminologi default site ("baru" atau "klasik"), apakah dapat dimatikan per site, dan apakah berlaku untuk proyek discovery. (O; M00 VISI-002; M04 PRJ-001; M26 BIZ-001; M36)
 5. **Alias JQL berbasis istilah work item** (mis. `workitemkey`, `workItemType`) di samping nama klasik. (M12 JQL-001)

@@ -13,7 +13,7 @@ import (
 
 //	@title			Jari API
 //	@version		1.0
-//	@description	REST API for Jari, an open-source work and project management platform (Jira clone). "Jari" is the working name until the final product name is decided.
+//	@description	REST API for Jari, an open-source work and project management platform (Jira clone).
 //	@termsOfService	http://swagger.io/terms/
 
 //	@contact.name	API Support

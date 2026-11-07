@@ -409,7 +409,7 @@ Strategi urutan implementasi: Fase 1 membangun fondasi yang dipakai semua kanal,
   12. ⚠ Konten panjang (description atau comment melebihi ±20.000 karakter, atau tabel perubahan melebihi 50 field) dipotong dengan tautan ke work item.
   13. ⚠ Alamat From/Reply-To default bersifat no-reply; membalas email notifikasi tidak menambah comment kecuali project email address diarahkan ke mailbox yang diproses mail handler (NTF-025, NTF-032).
 - **Team-managed vs company-managed:** Tidak ada perbedaan.
-- **Catatan & ketergantungan:** Render ADF di [07](07-editor-konten-kaya.md); field tersembunyi di [05](05-konfigurasi-work-item-skema.md); bahasa di NTF-010. Nama merek di prefix subject menunggu nama final produk (lihat [00](00-visi-ruang-lingkup-glosarium-baseline.md)). Template disimpan di kode (Go `html/template` + `text/template`) dan tidak dapat dikustomisasi admin (NTF-042).
+- **Catatan & ketergantungan:** Render ADF di [07](07-editor-konten-kaya.md); field tersembunyi di [05](05-konfigurasi-work-item-skema.md); bahasa di NTF-010. Nama merek di prefix subject adalah nama final produk, "Jari" (lihat [00](00-visi-ruang-lingkup-glosarium-baseline.md)). Template disimpan di kode (Go `html/template` + `text/template`) dan tidak dapat dikustomisasi admin (NTF-042).
 
 ### NTF-019 Batched Email Notifications
 
@@ -848,7 +848,6 @@ Strategi urutan implementasi: Fase 1 membangun fondasi yang dipakai semua kanal,
 - Apakah Single Email Address sebagai recipient (penerima non-user) diizinkan, mengingat risiko kebocoran data (NTF-006)?
 - Untuk penerimaan email masuk, apakah produk menyediakan domain inbound bawaan (webhook inbound) atau hanya IMAP mailbox milik pelanggan (NTF-023, NTF-034)?
 - Apakah aplikasi mobile native dibangun, atau Web Push di browser cukup sebagai pengganti Mobile Push Notifications (NTF-038)?
-- Apa nama produk final untuk prefix subject, From header, dan actor automation (NTF-018, NTF-024, NTF-037)?
 - Berapa nilai default batas volume (recipient per event, email per jam per penerima, batas email automation) yang dapat diterima pelanggan self-hosted (NTF-009, NTF-037)?
 
 ## Di luar cakupan & ekosistem

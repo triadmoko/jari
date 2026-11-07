@@ -1,6 +1,6 @@
 # 00 — Visi, Ruang Lingkup, Glosarium & Baseline Repo
 
-Modul ini adalah pintu masuk seluruh PRD. Isinya menetapkan visi produk, batas ruang lingkup per fase delivery, glosarium istilah Jira ↔ padanan Indonesia yang dipakai konsisten di semua modul, kondisi repo saat ini beserta gap dan remediasi Sprint 0, serta konvensi penulisan dokumen (template fitur, arti prioritas/tier/fase, prefix ID). Selain itu modul ini memuat tiga fitur lintas platform yang menjadi fondasi identitas produk: kepatuhan nama & merek, terminologi UI (work item & space), serta mekanisme tier plan & feature flag. Produk clone belum memiliki nama final; dokumen ini menyebutnya "produk ini" atau "clone", dan nama repo `jari` hanya dipakai sebagai nama kerja.
+Modul ini adalah pintu masuk seluruh PRD. Isinya menetapkan visi produk, batas ruang lingkup per fase delivery, glosarium istilah Jira ↔ padanan Indonesia yang dipakai konsisten di semua modul, kondisi repo saat ini beserta gap dan remediasi Sprint 0, serta konvensi penulisan dokumen (template fitur, arti prioritas/tier/fase, prefix ID). Selain itu modul ini memuat tiga fitur lintas platform yang menjadi fondasi identitas produk: kepatuhan nama & merek, terminologi UI (work item & space), serta mekanisme tier plan & feature flag. Nama final produk clone adalah **Jari**; dokumen ini menyebutnya "produk ini" atau "clone".
 
 Modul terkait:
 
@@ -321,12 +321,12 @@ Pekerjaan berikut diselesaikan sebelum fitur Fase 1 dimulai, karena menjadi pras
 - **S0-04 Konfigurasi aman** — tolak start (fail-fast) bila `JWT_SECRET` kosong/default di luar mode development; selaraskan `DB_PASS`/`DB_PASSWORD`; baca `ENV`; muat konfigurasi sekali dan injeksikan; hapus sisa `yopatungan` dari compose, nama container, dan database.
 - **S0-05 CORS & metode HTTP** — allowlist origin dari konfigurasi (bukan `*` bersama credentials); izinkan `PATCH`.
 - **S0-06 Otorisasi minimum** — batasi `GET /api/v1/users` untuk admin; tambahkan middleware peran berbasis klaim terverifikasi dari database sebagai jembatan sampai modul [03](03-izin-peran-keamanan.md) selesai.
-- **S0-07 Bersihkan warisan template** — hapus `ErrProductNotFound`, nasib redis sudah diputuskan: dipakai untuk queue dan tetap di compose ([ADR-0004](../adr/0004-job-latar-dan-queue.md)), ganti README template, ganti judul swagger "Backend API" dengan nama kerja produk.
+- **S0-07 Bersihkan warisan template** — hapus `ErrProductNotFound`, nasib redis sudah diputuskan: dipakai untuk queue dan tetap di compose ([ADR-0004](../adr/0004-job-latar-dan-queue.md)), ganti README template, ganti judul swagger "Backend API" dengan nama produk.
 - **S0-08 Regenerasi kontrak API** — jalankan `make swag` dan regenerasi `frontend/src/lib/api/api.ts`; ganti `first_name/last_name` menjadi `name` di `SessionUser`; verifikasi interceptor Bearer dan penanganan 401 di `client.ts`.
 - **S0-09 Pulihkan kerangka frontend** — putuskan apakah `(guest)` dan `+error.svelte` yang terhapus dipulihkan atau diganti; buat halaman login, register, home, profil minimal; isi atau hapus stub `lib/features/admin`.
 - **S0-10 Operasional dasar** — `/health` memeriksa koneksi DB (liveness vs readiness), request-id per permintaan, healthcheck Docker, level GORM logger mengikuti env, log JSON di produksi.
 - **S0-11 CI** — pipeline lint + unit test Go + test frontend + build image untuk setiap PR.
-- **S0-12 Identitas produk** — terapkan nama kerja produk dan aset brand sendiri di UI, email, user agent, swagger (VISI-001); tambahkan laporan lisensi dependensi.
+- **S0-12 Identitas produk** — terapkan nama produk "Jari" dan aset brand sendiri di UI, email, user agent, swagger (VISI-001); tambahkan laporan lisensi dependensi.
 - **S0-13 Fondasi i18n & terminologi** — siapkan katalog label UI terpusat ID/EN dengan istilah "work item"/"space" (VISI-002), memperluas pola konstanta galat id/en yang sudah ada.
 - **S0-14 Keputusan teknis Fase 1** — pilih library drag-and-drop untuk board, strategi penyimpanan berkas lampiran, transport SMTP, dan mekanisme job latar; dicatat sebagai ADR (rinciannya di modul [27](27-nfr-arsitektur-platform.md)). Hasil: [ADR-0001 sampai ADR-0004](../adr/README.md) berstatus Accepted — drag-and-drop dibangun sendiri (`lib/dnd`), lampiran di S3-kompatibel, email keluar lewat SMTP, dan queue di Redis (`asynq`).
 
@@ -446,7 +446,7 @@ Rujukan silang ditulis sebagai ID fitur (mis. `ISS-001`) disertai tautan relatif
 - **Prioritas / Fase / Tier:** P0 / Fase 1 / platform
 - **Aktor & izin:** Product Owner/PM (pemilik produk) dan Legal menetapkan nama dan pedoman merek; Engineering menerapkannya; Admin Situs dapat mengubah nama tampilan site dan logo instansi lewat pengaturan tampilan (modul 22); nama produk dasar tetap tercantum di halaman About dan berkas atribusi lisensi.
 - **Aturan perilaku (acceptance criteria):**
-  1. Nama produk berasal dari satu sumber konfigurasi build (nama kerja `jari` sampai nama final ditetapkan) dan dipakai di judul tab browser, header aplikasi, layar login, manifest/favicon, halaman About, dan judul dokumen OpenAPI; mengganti nama cukup dilakukan di satu tempat tanpa mengubah komponen.
+  1. Nama produk berasal dari satu sumber konfigurasi build (nama final produk: `Jari`) dan dipakai di judul tab browser, header aplikasi, layar login, manifest/favicon, halaman About, dan judul dokumen OpenAPI; mengganti nama cukup dilakukan di satu tempat tanpa mengubah komponen.
   2. Email keluar memakai nama produk (atau nama tampilan site) pada display name pengirim, subjek, dan footer; tidak ada templat email yang memuat kata "Jira" atau "Atlassian" sebagai nama layanan.
   3. User agent untuk semua permintaan HTTP keluar (webhook, unfurl, integrasi) berformat `<NamaProduk>/<versi> (+<url-proyek>)`; domain dan hostname contoh di dokumentasi serta konfigurasi default memakai `example.com` atau domain milik proyek, tidak pernah `*.atlassian.net` atau domain yang memuat "jira".
   4. Pemeriksaan otomatis di CI memindai bundle SPA, katalog i18n, templat email, dan dokumentasi untuk kata "Jira"/"Atlassian"; kemunculan di luar daftar konteks deskriptif yang diizinkan (importer, disclaimer kompatibilitas, glosarium, PRD) menggagalkan build.
@@ -507,8 +507,7 @@ Rujukan silang ditulis sebagai ID fitur (mis. `ISS-001`) disertai tautan relatif
 
 ## Pertanyaan terbuka
 
-- Apa nama final produk, dan apakah nama tersebut perlu didaftarkan sebagai merek (mis. di DJKI) sebelum rilis publik pertama?
-- Lisensi open-source apa yang dipakai proyek (mis. MIT, Apache-2.0, atau AGPL-3.0), mengingat pilihan ini menentukan daftar tolak lisensi dependensi di VISI-001?
+- Apakah nama final "Jari" perlu didaftarkan sebagai merek (mis. di DJKI) sebelum rilis publik pertama?
 - Nama apa yang dipakai di UI untuk bahasa kueri JQL-kompatibel, dan apakah akronim "JQL" boleh muncul di UI?
 - Apakah UI Bahasa Indonesia memakai "Ruang" sebagai padanan "space" atau tetap "Proyek", dan apakah set terminologi default site adalah "baru" atau "klasik"?
 - Tier apa yang aktif secara default pada instalasi self-hosted: semua fitur terbuka (setara Enterprise) atau simulasi plan bertingkat untuk edisi komersial di masa depan?

@@ -562,7 +562,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Jari API",
-	Description:      "REST API for Jari, an open-source work and project management platform (Jira clone). \"Jari\" is the working name until the final product name is decided.",
+	Description:      "REST API for Jari, an open-source work and project management platform (Jira clone).",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

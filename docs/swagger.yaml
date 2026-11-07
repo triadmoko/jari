@@ -104,7 +104,7 @@ info:
     name: API Support
     url: http://www.swagger.io/support
   description: REST API for Jari, an open-source work and project management platform
-    (Jira clone). "Jari" is the working name until the final product name is decided.
+    (Jira clone).
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0

@@ -1450,7 +1450,7 @@ Strategi urutan implementasi: modul ini tidak punya fitur Fase 1 karena MVP belu
 - Apakah konektor Slack (INT-030 s.d. INT-034) yang berprioritas P1 perlu ditarik dari Fase 4 ke Fase 3 agar hadir bersama otomasi dan webhook?
 - Registry app (INT-061) berbentuk katalog lokal per instans, katalog publik komunitas, atau keduanya, dan siapa yang mengkurasi badge keamanan?
 - Apakah UI extension point berbasis iframe (INT-069 s.d. INT-075) termasuk peta jalan, atau ekstensi cukup dibatasi pada REST + webhook + entity properties?
-- Nama perintah slash dan nama konektor chat menunggu nama final produk; apakah prefiks `/jira` diganti sejak awal?
+- Nama perintah slash dan nama konektor chat mengikuti nama produk "Jari"; apakah prefiks `/jira` diganti sejak awal?
 
 ## Di luar cakupan & ekosistem
 

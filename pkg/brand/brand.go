@@ -1,5 +1,5 @@
 // Package brand is the single place that defines the product identity on the
-// backend. Change Name/Slug here when the final product name is decided.
+// backend. "Jari" is the final product name; if it ever changes, change Name/Slug here.
 //
 // Not covered: the Swagger annotations in cmd/api/main.go (@title and
 // @description) are comments, so swag cannot read these constants; update them by hand.

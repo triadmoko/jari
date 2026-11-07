@@ -240,7 +240,7 @@ export class HttpClient<SecurityDataType = unknown> {
  * @baseUrl //localhost:8080/api/v1
  * @contact API Support <support@swagger.io> (http://www.swagger.io/support)
  *
- * REST API for Jari, an open-source work and project management platform (Jira clone). "Jari" is the working name until the final product name is decided.
+ * REST API for Jari, an open-source work and project management platform (Jira clone).
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
 	api = {

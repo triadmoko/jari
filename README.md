@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/triadmoko/jari/actions/workflows/ci.yml/badge.svg)](https://github.com/triadmoko/jari/actions/workflows/ci.yml)
 
-Jari adalah platform manajemen kerja dan proyek open-source yang meniru fitur inti Jira: proyek, work item, board, backlog dan sprint, workflow, pencarian (JQL), laporan, dan administrasi. "Jari" adalah **nama kerja** sampai nama produk final ditetapkan.
+Jari adalah platform manajemen kerja dan proyek open-source yang meniru fitur inti Jira: proyek, work item, board, backlog dan sprint, workflow, pencarian (JQL), laporan, dan administrasi. "Jari" adalah nama final produk ini.
 
 Proyek ini masih dalam tahap awal (Sprint 0, remediasi baseline). Ruang lingkup, fase delivery, dan keputusan teknis ada di dokumen berikut:
 
@@ -14,9 +14,9 @@ Proyek ini masih dalam tahap awal (Sprint 0, remediasi baseline). Ruang lingkup,
 
 | Komponen | Teknologi |
 |----------|-----------|
-| Backend | Go 1.26, [Gin](https://github.com/gin-gonic/gin), [GORM](https://gorm.io) |
-| Database | PostgreSQL 15+, migrasi dengan [golang-migrate](https://github.com/golang-migrate/migrate) |
-| Queue / job latar | Redis 7 dengan `asynq` ([ADR-0004](docs/adr/0004-job-latar-dan-queue.md)); belum dipakai kode |
+| Backend | Go 1.27, [Gin](https://github.com/gin-gonic/gin), [GORM](https://gorm.io) |
+| Database | PostgreSQL 18+, migrasi dengan [golang-migrate](https://github.com/golang-migrate/migrate) |
+| Queue / job latar | Redis 8 dengan `asynq` ([ADR-0004](docs/adr/0004-job-latar-dan-queue.md)); belum dipakai kode |
 | Autentikasi | JWT ([golang-jwt](https://github.com/golang-jwt/jwt) v5), password bcrypt |
 | Frontend | SvelteKit (SPA statis) di `frontend/`, di-embed ke binary Go |
 | Dokumentasi API | Swagger ([swag](https://github.com/swaggo/swag)) dengan UI Scalar |
@@ -26,8 +26,8 @@ Arsitektur backend memakai Clean Architecture dengan modul per fitur. Panduan le
 
 ## Prasyarat
 
-- Go 1.26+
-- PostgreSQL 15+
+- Go 1.27+
+- PostgreSQL 18+
 - [bun](https://bun.sh) untuk membangun frontend
 - Docker dan Docker Compose (opsional, untuk menjalankan semua layanan)
 - [gow](https://github.com/mitranim/gow) untuk hot-reload (opsional)
@@ -137,7 +137,7 @@ Workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) berjalan di seti
 | Generated code | `make mock-gen` dan `make swag` tidak boleh menghasilkan diff |
 | Frontend | `bun run check`, `bun run lint`, `bun run test` (vitest + Chromium) |
 | Build | `make build` (SPA ter-embed) dan `docker build` tanpa push |
-| Migrations | Postgres 15: `migrate up` → `down all` → `up` di database kosong |
+| Migrations | Postgres 18: `migrate up` → `down all` → `up` di database kosong |
 
 Versi generator dipin di bagian `env` workflow (`mockery`, `swag`, `golangci-lint`) agar pemeriksaan drift konsisten. Jalankan versi yang sama secara lokal sebelum membuka PR; kalau CI melaporkan drift, jalankan `make mock-gen` / `make swag` lalu commit hasilnya.
 
@@ -149,7 +149,7 @@ Cache modul Go (`actions/setup-go`), paket bun, dan layer Docker (`type=gha`) di
 
 ## Lisensi
 
-Proyek ini berlisensi [Apache License 2.0](LICENSE). Nama final produk masih keputusan terbuka (lihat [PRD modul 00](docs/prd/00-visi-ruang-lingkup-glosarium-baseline.md)). Laporan lisensi dependensi ada di [`docs/licenses/`](docs/licenses/README.md) (`make licenses`, `make licenses-check`).
+Proyek ini berlisensi [Apache License 2.0](LICENSE). Hak cipta 2026 Triadmoko Denny Fatrosa (lihat [`NOTICE`](NOTICE)). Nama final produk adalah **Jari**; perlu tidaknya pendaftaran merek masih terbuka (lihat [PRD modul 00](docs/prd/00-visi-ruang-lingkup-glosarium-baseline.md)). Laporan lisensi dependensi ada di [`docs/licenses/`](docs/licenses/README.md) (`make licenses`, `make licenses-check`).
 
 ## Identitas produk
 
