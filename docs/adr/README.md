@@ -17,5 +17,8 @@ Keputusan teknis penting proyek dicatat di sini, satu file per keputusan, supaya
 | [0002](0002-penyimpanan-lampiran.md) | Penyimpanan lampiran (attachment) | Accepted | 2026-11-07 | KAN-11 |
 | [0003](0003-transport-email-keluar.md) | Transport email keluar | Accepted | 2026-11-07 | KAN-11 |
 | [0004](0004-job-latar-dan-queue.md) | Mekanisme job latar dan queue | Accepted | 2026-11-07 | KAN-11 |
+| [0005](0005-tipe-identitas.md) | Tipe identitas entitas inti | Accepted | 2026-11-07 | KAN-12 |
+| [0006](0006-penyimpanan-custom-field.md) | Penyimpanan nilai custom field | Accepted | 2026-11-07 | KAN-12 |
+| [0007](0007-format-rich-text.md) | Format penyimpanan rich text | Accepted | 2026-11-07 | KAN-12 |
 
-Nomor 0005 dan seterusnya disediakan untuk ADR berikutnya, termasuk ADR model data inti (KAN-12, S0-15).
+Nomor 0008 dan seterusnya disediakan untuk ADR berikutnya.

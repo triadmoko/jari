@@ -346,11 +346,21 @@ Strategi urutan implementasi: model data adalah prasyarat semua modul, sehingga 
 - **Team-managed vs company-managed:** Tidak ada perbedaan.
 - **Catatan & ketergantungan:** Fitur platform yang muncul lewat related content dan AI (Rovo) di platform asal, bukan fitur mandiri. Sumber edge: DEV-001 ([24](24-integrasi-devops.md)), ISS-029, ISS-030 ([06](06-work-item-inti.md)), Goals & Teams di PLAN-057, PLAN-061 ([18](18-timeline-rencana-tampilan-proyek.md)); pencarian AI di NAV-015, NAV-051 ([21](21-navigasi-ux-preferensi.md)); outbound request konektor dijaga INT-001 ([25](25-integrasi-impor-ekspor-ekstensi.md)).
 
+## Keputusan arsitektur
+
+Keputusan model data Fase 1 dicatat sebagai ADR di [`docs/adr/`](../adr/README.md) (S0-15, KAN-12):
+
+| ADR | Keputusan | Fitur terkait |
+| --- | --- | --- |
+| [ADR-0005](../adr/0005-tipe-identitas.md) | `projects`/`issues` memakai `BIGINT`; `users.id` tetap UUID `VARCHAR(36)`; `account_id` kolom terpisah untuk API publik. | DM-001, DM-003, DM-005 |
+| [ADR-0006](../adr/0006-penyimpanan-custom-field.md) | Custom field disimpan hybrid: `issues.fields` JSONB + tabel bertipe `issue_field_values`. | DM-005 |
+| [ADR-0007](../adr/0007-format-rich-text.md) | Rich text disimpan sebagai JSON ala ADF (editor TipTap/ProseMirror); konversi di tepi. | DM-003, DM-005, EDT-001, EDT-002 |
+
 ## Pertanyaan terbuka
 
-1. Apakah id internal `users` tetap UUID `VARCHAR(36)` (kondisi repo) dengan `account_id` terpisah, atau `account_id` langsung memakai nilai UUID yang ada agar migrasi lebih sederhana?
+1. Apakah id internal `users` tetap UUID `VARCHAR(36)` (kondisi repo) dengan `account_id` terpisah, atau `account_id` langsung memakai nilai UUID yang ada agar migrasi lebih sederhana? **Terjawab ([ADR-0005](../adr/0005-tipe-identitas.md)):** `users.id` tetap UUID `VARCHAR(36)` dan `account_id` kolom terpisah.
 2. Apakah login dengan `username` (kolom repo saat ini) tetap didukung sebagai alias legacy, atau dihapus sepenuhnya dan diganti email saja mengikuti model Cloud?
-3. Apakah model hybrid JSONB + tabel bertipe untuk custom field disetujui sebagai keputusan final, atau cukup EAV murni pada Fase 1 lalu JSONB ditambahkan saat dibutuhkan performa?
+3. Apakah model hybrid JSONB + tabel bertipe untuk custom field disetujui sebagai keputusan final, atau cukup EAV murni pada Fase 1 lalu JSONB ditambahkan saat dibutuhkan performa? **Terjawab ([ADR-0006](../adr/0006-penyimpanan-custom-field.md)):** hybrid disetujui sebagai keputusan final.
 4. Berapa angka default batas jumlah custom field per situs dan batas issue yang ditampilkan board yang akan dipakai produk ini?
 5. Apakah riwayat versi workflow dengan rollback dibangun sejak Fase 2 bersama editor workflow, atau hanya snapshot audit tanpa fungsi rollback?
 6. Apakah pola project key kustom (pengaturan khas Data Center) disediakan sebagai opsi untuk instance self-hosted?

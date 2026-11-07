@@ -357,8 +357,14 @@ Pertanyaan outline "apakah Service Management dan Product Discovery di luar caku
 ### D. Arsitektur, model data & infrastruktur
 
 1. **Tipe identitas**: `id` project bigint numerik (kompatibel API) sementara `users.id` tetap UUID `VARCHAR(36)`, atau diseragamkan. Juga apakah `account_id` terpisah atau memakai UUID yang ada. (M04 PRJ-001; M28)
+
+   **Terjawab ([ADR-0005](../adr/0005-tipe-identitas.md)):** `projects.id` dan `issues.id` memakai `BIGINT`; `users.id` tetap UUID `VARCHAR(36)` tanpa migrasi primary key; `account_id` adalah kolom terpisah yang dipakai di API publik. Id numerik diserialisasi sebagai string di JSON.
 2. **Penyimpanan custom field**: hybrid JSONB + tabel bertipe sebagai keputusan final, atau EAV murni di Fase 1. (M28)
+
+   **Terjawab ([ADR-0006](../adr/0006-penyimpanan-custom-field.md)):** hybrid `issues.fields` JSONB + tabel bertipe `issue_field_values` dipilih sebagai keputusan final; EAV murni ditolak.
 3. **Format rich text**: dokumen JSON ala ADF (ProseMirror/TipTap) atau Markdown. Juga apakah impor/ekspor ADF dan wiki markup diperlukan, termasuk alias `/rest/api/2`. (O; M23)
+
+   **Terjawab ([ADR-0007](../adr/0007-format-rich-text.md)):** rich text disimpan sebagai JSON ala ADF dengan editor TipTap/ProseMirror. Alias REST v2 dan impor/ekspor wiki markup tidak menjadi syarat Fase 1; fasenya ditetapkan di modul 23 dan 25.
 4. **Search engine**: Postgres FTS saja atau OpenSearch/Meilisearch, dan pada ambang berapa mode eksternal wajib. Juga apakah stemming Bahasa Indonesia menjadi syarat rilis Fase 1, dan apakah konfigurasinya per situs atau per dokumen. (O; M12 JQL-012; M13 SRC-001; M27 NFR-010)
 5. **Queue, cache & pub/sub**: River (PostgreSQL) dengan Redis opsional, atau Redis wajib sejak Fase 2. Juga apakah Redis di docker-compose tetap dipakai, dan apakah outbox cukup dengan Postgres (polling/LISTEN-NOTIFY) atau perlu broker sejak Fase 3. (O; M27 NFR-003, NFR-008, NFR-009; M28)
 
