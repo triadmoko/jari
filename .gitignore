@@ -2,3 +2,6 @@
 # Embedded SPA build output (keep the placeholder so go:embed compiles)
 internal/shared/delivery/http/webui/dist/*
 !internal/shared/delivery/http/webui/dist/.gitkeep
+
+# Jira API token lokal (jangan di-commit)
+.jira-token
