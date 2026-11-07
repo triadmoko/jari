@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 )
 
@@ -17,6 +18,10 @@ const (
 // developmentJWTSecret is only used when ENV=development and JWT_SECRET is empty,
 // so local runs work out of the box. It is rejected in every other environment.
 const developmentJWTSecret = "dev-only-insecure-jwt-secret"
+
+// developmentCORSOrigins is the Vite dev server origin, used only when
+// ENV=development and CORS_ALLOWED_ORIGINS is empty.
+var developmentCORSOrigins = []string{"http://localhost:5173", "http://127.0.0.1:5173"}
 
 // insecureJWTSecrets are placeholder values that must never sign tokens outside
 // development (the old built-in default and the sample values from the repo).
@@ -35,6 +40,7 @@ type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
 	JWT      JWTConfig
+	CORS     CORSConfig
 }
 
 // ServerConfig holds server configuration
@@ -57,6 +63,13 @@ type DatabaseConfig struct {
 // JWTConfig holds JWT configuration
 type JWTConfig struct {
 	Secret string
+}
+
+// CORSConfig holds the cross-origin allowlist.
+type CORSConfig struct {
+	// AllowedOrigins lists the origins permitted to make cross-origin requests.
+	// Empty means every cross-origin request is rejected (same-origin still works).
+	AllowedOrigins []string
 }
 
 // IsDevelopment reports whether the app runs with ENV=development.
@@ -89,6 +102,9 @@ func Parse() *Config {
 		JWT: JWTConfig{
 			Secret: getEnv("JWT_SECRET", ""),
 		},
+		CORS: CORSConfig{
+			AllowedOrigins: getEnvList("CORS_ALLOWED_ORIGINS"),
+		},
 	}
 }
 
@@ -119,7 +135,22 @@ func (c *Config) Validate() error {
 		errs = append(errs, err)
 	}
 
+	if err := c.validateCORS(); err != nil {
+		errs = append(errs, err)
+	}
+
 	return errors.Join(errs...)
+}
+
+func (c *Config) validateCORS() error {
+	if len(c.CORS.AllowedOrigins) == 0 && c.IsDevelopment() {
+		c.CORS.AllowedOrigins = append([]string(nil), developmentCORSOrigins...)
+	}
+
+	if slices.Contains(c.CORS.AllowedOrigins, "*") {
+		return errors.New("CORS_ALLOWED_ORIGINS must list explicit origins, \"*\" is not allowed because credentials are enabled")
+	}
+	return nil
 }
 
 func (c *Config) validateJWT() error {
@@ -145,4 +176,16 @@ func getEnv(key, fallback string) string {
 		return value
 	}
 	return fallback
+}
+
+// getEnvList reads a comma-separated environment variable, trimming spaces and
+// dropping empty entries. It returns nil when the variable is unset or empty.
+func getEnvList(key string) []string {
+	var out []string
+	for item := range strings.SplitSeq(os.Getenv(key), ",") {
+		if item = strings.TrimSpace(item); item != "" {
+			out = append(out, item)
+		}
+	}
+	return out
 }

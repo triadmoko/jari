@@ -68,6 +68,7 @@ The API will be available at `http://localhost:8080`.
 | `DB_NAME` | Database name | `db_name` |
 | `DB_SSLMODE` | SSL mode | `disable` |
 | `JWT_SECRET` | JWT signing key. Required unless `ENV=development`; the server refuses to start if it is empty or a placeholder such as `your-secret-key` | *(required)* |
+| `CORS_ALLOWED_ORIGINS` | Comma-separated browser origins allowed to call the API (`*` is rejected). Empty rejects all cross-origin requests; the embedded SPA is same-origin and unaffected. In `development`, empty allows `http://localhost:5173` | *(empty)* |
 | `ENV` | `development`, `production`, or `test` | `development` |
 
 Configuration is loaded and validated once in `app.New()` and injected into components. `docker compose` reads `DB_PASS` and `JWT_SECRET` from `.env`.

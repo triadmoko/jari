@@ -82,7 +82,7 @@ func (a *App) setupRouter() *gin.Engine {
 	// Global middleware
 	router.Use(middleware.LoggerMiddleware())
 	router.Use(gin.Recovery())
-	router.Use(middleware.CORSMiddleware())
+	router.Use(middleware.CORSMiddleware(a.Config.CORS.AllowedOrigins))
 	router.Use(middleware.LanguageMiddleware())
 
 	// Health check endpoint

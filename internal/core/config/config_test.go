@@ -13,6 +13,7 @@ func clearEnv(t *testing.T) {
 	for _, k := range []string{
 		"ENV", "SERVER_PORT", "SERVER_HOST", "DATABASE_URL",
 		"DB_HOST", "DB_PORT", "DB_USER", "DB_PASS", "DB_NAME", "DB_SSLMODE", "JWT_SECRET",
+		"CORS_ALLOWED_ORIGINS",
 	} {
 		t.Setenv(k, "")
 	}
@@ -137,4 +138,56 @@ func TestParse_Defaults(t *testing.T) {
 	assert.Equal(t, "5432", cfg.Database.Port)
 	assert.Equal(t, "disable", cfg.Database.SSLMode)
 	assert.Empty(t, cfg.JWT.Secret, "Parse must not invent a JWT secret")
+}
+
+func TestParse_CORSAllowedOriginsIsTrimmedList(t *testing.T) {
+	clearEnv(t)
+	t.Setenv("CORS_ALLOWED_ORIGINS", " https://app.example.com , ,https://admin.example.com")
+
+	cfg := Parse()
+
+	assert.Equal(t, []string{"https://app.example.com", "https://admin.example.com"}, cfg.CORS.AllowedOrigins)
+}
+
+func TestLoad_DevelopmentDefaultsToViteOrigins(t *testing.T) {
+	clearEnv(t)
+	t.Setenv("ENV", "development")
+
+	cfg, err := Load()
+
+	require.NoError(t, err)
+	assert.Equal(t, developmentCORSOrigins, cfg.CORS.AllowedOrigins)
+}
+
+func TestLoad_DevelopmentKeepsExplicitOrigins(t *testing.T) {
+	clearEnv(t)
+	t.Setenv("ENV", "development")
+	t.Setenv("CORS_ALLOWED_ORIGINS", "http://localhost:3000")
+
+	cfg, err := Load()
+
+	require.NoError(t, err)
+	assert.Equal(t, []string{"http://localhost:3000"}, cfg.CORS.AllowedOrigins)
+}
+
+func TestLoad_ProductionWithoutOriginsRejectsCrossOrigin(t *testing.T) {
+	clearEnv(t)
+	t.Setenv("ENV", "production")
+	t.Setenv("JWT_SECRET", "a-long-random-test-secret-value")
+
+	cfg, err := Load()
+
+	require.NoError(t, err)
+	assert.Empty(t, cfg.CORS.AllowedOrigins)
+}
+
+func TestLoad_WildcardOriginFails(t *testing.T) {
+	clearEnv(t)
+	t.Setenv("ENV", "development")
+	t.Setenv("CORS_ALLOWED_ORIGINS", "https://app.example.com,*")
+
+	_, err := Load()
+
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "CORS_ALLOWED_ORIGINS")
 }

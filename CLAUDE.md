@@ -151,6 +151,7 @@ Language is detected from `Accept-Language` header by `middleware.LanguageMiddle
 All config loaded via `internal/core/config/` from environment variables. Required variables:
 - `DB_*` - Database connection
 - `JWT_SECRET` - Token signing key
+- `CORS_ALLOWED_ORIGINS` - Optional, comma-separated browser origin allowlist (empty = no cross-origin; dev defaults to the Vite origin)
 - `SERVER_PORT` / `SERVER_HOST` - Server binding
 
 ## Development Notes
