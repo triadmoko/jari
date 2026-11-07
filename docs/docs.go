@@ -153,7 +153,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get a paginated and filtered list of users",
+                "description": "Get a paginated and filtered list of users. Admin only (temporary bridge until the permissions \u0026 roles module).",
                 "consumes": [
                     "application/json"
                 ],
@@ -243,6 +243,12 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }

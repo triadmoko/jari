@@ -16,6 +16,7 @@ const (
 	InvalidInput
 	ValidationFailed
 	Unauthorized
+	Forbidden
 
 	// Auth errors
 	InvalidCredentials
@@ -48,6 +49,10 @@ var errMessages = map[ErrCode]map[Lang]string{
 	Unauthorized: {
 		LangEN: "unauthorized",
 		LangID: "tidak memiliki akses",
+	},
+	Forbidden: {
+		LangEN: "forbidden",
+		LangID: "anda tidak memiliki izin untuk aksi ini",
 	},
 
 	// Auth errors

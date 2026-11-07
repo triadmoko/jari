@@ -119,7 +119,7 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 // GetUsers handles getting list of users
 //
 //	@Summary		Get users list
-//	@Description	Get a paginated and filtered list of users
+//	@Description	Get a paginated and filtered list of users. Admin only (temporary bridge until the permissions & roles module).
 //	@Tags			users
 //	@Accept			json
 //	@Produce		json
@@ -135,6 +135,7 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 //	@Success		200			{object}	response.Response{data=dto_user.UserListResponse}
 //	@Failure		400			{object}	response.Response
 //	@Failure		401			{object}	response.Response
+//	@Failure		403			{object}	response.Response
 //	@Failure		500			{object}	response.Response
 //	@Router			/api/v1/users [get]
 func (h *UserHandler) GetUsers(c *gin.Context) {

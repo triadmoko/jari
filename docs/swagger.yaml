@@ -190,7 +190,8 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get a paginated and filtered list of users
+      description: Get a paginated and filtered list of users. Admin only (temporary
+        bridge until the permissions & roles module).
       parameters:
       - default: 10
         description: Items per page
@@ -244,6 +245,10 @@ paths:
             $ref: '#/definitions/response.Response'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
           schema:
             $ref: '#/definitions/response.Response'
         "500":

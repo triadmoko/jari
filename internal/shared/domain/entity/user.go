@@ -7,6 +7,13 @@ import (
 	"gorm.io/gorm"
 )
 
+// Role values stored in users.role. This is a temporary authorization bridge
+// (S0-06) until the permissions & roles module (PRD 03) replaces it.
+const (
+	RoleUser  = "user"
+	RoleAdmin = "admin"
+)
+
 // User represents a user entity in the domain layer
 type User struct {
 	ID        string         `json:"id" gorm:"type:varchar(36);primaryKey"`
